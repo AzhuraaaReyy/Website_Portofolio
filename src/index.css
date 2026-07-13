@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-blueprint-bg: #0B1220;       /* Navy sangat gelap */
+  --color-blueprint-bgSec: #132238;    /* Navy sekunder (cards/sections) */
+  --color-blueprint-teal: #5EEAD4;     /* Teal cerah (primary accent) */
+  --color-blueprint-amber: #F5B754;    /* Amber hangat (secondary accent) */
+  --color-blueprint-text: #E8ECF1;     /* Putih kebiruan (text primary) */
+  --color-blueprint-textSec: #8A93A6;  /* Abu kebiruan (text secondary) */
+  --color-blueprint-line: rgba(94, 234, 212, 0.08); /* Blueprint grid line color */
+
+  --font-sans: "Inter", sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@utility blueprint-grid {
+  background-image: 
+    linear-gradient(to right, rgba(94, 234, 212, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(94, 234, 212, 0.04) 1px, transparent 1px);
+}
+
+@utility grid-size {
+  background-size: 40px 40px;
+}
+
+@layer base {
+  body {
+    @apply bg-blueprint-bg text-blueprint-text font-sans selection:bg-blueprint-teal/30 selection:text-blueprint-teal antialiased overflow-x-hidden;
+    background-image: 
+      linear-gradient(to right, rgba(94, 234, 212, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(94, 234, 212, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: center top;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display text-blueprint-text tracking-wide;
+  }
+}
+
+/* Custom Scrollbar styled for Blueprint */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B1220;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #132238;
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(94, 234, 212, 0.4);
+}
+
+/* Blueprint Line & Glow animations */
+.blueprint-line-vertical {
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(94, 234, 212, 0.2) 20%, rgba(94, 234, 212, 0.2) 80%, transparent);
+}
+
+.blueprint-line-horizontal {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(94, 234, 212, 0.2) 20%, rgba(94, 234, 212, 0.2) 80%, transparent);
+}
+
+/* Glowing dot signals */
+.blueprint-glow {
+  box-shadow: 0 0 15px rgba(94, 234, 212, 0.6);
+}
+
+/* Hide R3F outline overlay on canvas focus */
+canvas:focus {
+  outline: none;
+}
