@@ -1,5 +1,6 @@
 export interface Profile {
   name: string;
+  avatar: string;
   role: string;
   tagline: string;
   bio: string;
@@ -44,9 +45,10 @@ export interface TimelineItem {
 
 export const profileData: Profile = {
   name: "Muhammad Rizal",
-  role: "Full-Stack Developer",
-  tagline: "Building High-Performance Applications from Database to Front-End",
-  bio: "Mahasiswa Teknik Informatika yang berfokus pada rekayasa perangkat lunak modern. Memiliki keahlian dalam merancang arsitektur web modular, mengoptimalkan database relasional, dan menciptakan antarmuka pengguna yang sangat interaktif. Berpengalaman membangun proyek end-to-end dari perancangan hingga deployment production.",
+  avatar: "/assets/images/Foto1.jpeg",
+  role: "Full-Stack Engineer",
+  tagline: "Merancang arsitektur perangkat lunak scalable dan antarmuka presisi untuk performa optimal",
+  bio: "Seorang Full-Stack Engineer dengan spesialisasi dalam rekayasa perangkat lunak modern. Memiliki keahlian mendalam dalam merancang arsitektur web modular, mengoptimalkan database relasional, dan menciptakan antarmuka interaktif. Berpengalaman mengeksekusi proyek kompleks dari fase perancangan sistem hingga deployment berskala produksi.",
   cvUrl: "/cv-placeholder.pdf",
   email: "mailto:muhammadrizal52@gmail.com",
   whatsapp: "https://wa.me/6283162253730", // Placeholder WA link

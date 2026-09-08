@@ -14,6 +14,28 @@
   --font-sans: "Inter", sans-serif;
   --font-display: "Space Grotesk", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+
+  /* Keyframes kustom */
+  --animate-scan: scan 3s ease-in-out infinite;
+  --animate-shimmer: shimmer 2s infinite;
+
+  @keyframes scan {
+    0%, 100% { transform: translateY(-100%); opacity: 0; }
+    10%, 90% { opacity: 0.5; }
+    50% { transform: translateY(100vh); opacity: 0.2; }
+  }
+  
+  @keyframes shimmer {
+    100% { transform: translateX(100%); }
+  }
+}
+
+@utility clip-text-reveal {
+  clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+}
+
+.group:hover .clip-text-reveal {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
 }
 
 @utility blueprint-grid {
