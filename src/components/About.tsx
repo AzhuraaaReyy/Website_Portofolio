@@ -2,9 +2,6 @@ import { useState, useRef } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
   Crosshair,
-  Wifi,
-  Volume2,
-  VolumeX,
   ChevronLeft,
   ChevronRight,
   Rocket,
