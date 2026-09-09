@@ -47,7 +47,8 @@ export const profileData: Profile = {
   name: "Muhammad Rizal",
   avatar: "/assets/images/Foto1.jpeg",
   role: "Full-Stack Engineer",
-  tagline: "Merancang arsitektur perangkat lunak scalable dan antarmuka presisi untuk performa optimal",
+  tagline:
+    "Merancang arsitektur perangkat lunak scalable dan antarmuka presisi untuk performa optimal",
   bio: "Seorang Full-Stack Engineer dengan spesialisasi dalam rekayasa perangkat lunak modern. Memiliki keahlian mendalam dalam merancang arsitektur web modular, mengoptimalkan database relasional, dan menciptakan antarmuka interaktif. Berpengalaman mengeksekusi proyek kompleks dari fase perancangan sistem hingga deployment berskala produksi.",
   cvUrl: "/cv-placeholder.pdf",
   email: "mailto:muhammadrizal52@gmail.com",
@@ -60,113 +61,168 @@ export const skillsData: SkillCategory[] = [
   {
     title: "Bahasa Pemrograman",
     skills: [
-      { name: "HTML", level: "Mahir" },
+      { name: "HTML,CSS", level: "Mahir" },
       { name: "PHP", level: "Mahir" },
-      { name: "TypeScript", level: "Mahir" },
       { name: "JavaScript", level: "Mahir" },
-      { name: "Python", level: "Dasar" },
-      { name: "C++", level: "Dasar" }
-    ]
+      { name: "TypeScript", level: "Menengah" },
+    ],
   },
   {
     title: "Frontend Development",
     skills: [
-      { name: "React.js", level: "Mahir" },
       { name: "Next.js", level: "Mahir" },
       { name: "Tailwind CSS", level: "Mahir" },
       { name: "Bootstrap", level: "Mahir" },
-      { name: "Three.js / React Three Fiber", level: "Dasar" }
-    ]
+      { name: "Three.js / React Three Fiber", level: "Dasar" },
+    ],
   },
   {
     title: "Backend Development",
     skills: [
       { name: "Laravel", level: "Mahir" },
       { name: "RESTful API / GraphQL", level: "Mahir" },
-    ]
+      { name: "BaaS / SUPABASE", level: "Mahir" },
+      { name: "BaaS / FIREBASE", level: "Mahir" },
+    ],
   },
   {
     title: "Database Systems",
     skills: [
       { name: "PostgreSQL", level: "Mahir" },
-      { name: "MongoDB", level: "Mahir" },
-      { name: "Redis (Caching)", level: "Menengah" },
-      { name: "MySQL", level: "Menengah" }
-    ]
+      { name: "MySQL", level: "Mahir" },
+    ],
   },
   {
     title: "Tools & Deployment",
     skills: [
-      { name: "Docker", level: "Mahir" },
-      { name: "Git / GitHub Actions", level: "Mahir" },
-      { name: "AWS (S3 / EC2)", level: "Menengah" },
+      { name: "Git / GitHub", level: "Mahir" },
       { name: "Vercel / Netlify", level: "Mahir" },
-      { name: "Linux / Bash", level: "Menengah" }
-    ]
-  }
+      { name: "Linux / Bash", level: "Menengah" },
+      { name: "Docker", level: "Dasar" },
+    ],
+  },
 ];
 
 export const projectsData: Project[] = [
   {
-    id: "project-1",
-    title: "Skyline ERP System",
-    shortDesc: "Sistem ERP modular komprehensif untuk optimasi inventaris dan pelaporan keuangan real-time perusahaan retail.",
-    longDesc: "Skyline ERP menyelesaikan masalah mismanajemen stok dan pelaporan keuangan retail. Dibangun dengan backend Go berkinerja tinggi, caching Redis, dan frontend React. Sistem ini menangani sinkronisasi stok real-time melalui WebSocket dan menyajikan analitik data inventaris masif dengan dashboard grafik yang responsif.",
-    tech: ["Go", "React.js", "PostgreSQL", "Redis", "Tailwind CSS", "WebSockets"],
-    demoUrl: "https://skyline-demo.vercel.app",
-    githubUrl: "https://github.com/aryazhur/skyline-erp",
+    id: "project-pos-bengkel",
+    title: "Sistem POS & Manajemen Bengkel Motor Berbasis Web",
+    shortDesc:
+      "Aplikasi Full-Stack ERP & Point-of-Sale (POS) modular yang dirancang untuk digitalisasi operasional, pembayaran online, dan manajemen inventaris UMKM bengkel motor.",
+    longDesc:
+      "Solusi digital end-to-end yang saya bangun dari awal untuk mengatasi kendala pencatatan manual pada UMKM bengkel. Sistem ini memisahkan hak akses secara dinamis: Owner dapat memantau laporan omzet real-time melalui dashboard analitik, sedangkan Kasir fokus pada transaksi penjualan cepat di menu POS. Dilengkapi dengan fitur pemantauan stok otomatis, integrasi Payment Gateway untuk pembayaran online, serta sistem booking servis yang terintegrasi langsung dengan notifikasi WhatsApp.",
+    tech: [
+      "Next.js (React)",
+      "Laravel",
+      "MySQL",
+      "Tailwind CSS",
+      "Payment Gateway API",
+      "WhatsApp Business API",
+    ],
+    demoUrl: "https://sistem-manajemen-pos-bengkel-motor.vercel.app",
+    githubUrl:
+      "https://github.com/AzhuraaaReyy/Sistem-Manajemen-POS-BengkelMotor",
     mediaType: "video",
-    mediaUrl: "https://assets.mixkit.co/videos/preview/mixkit-software-developer-working-on-his-computer-34287-large.mp4", // Free stock video placeholder
-    featured: true
+    mediaUrl: "",
+    featured: true,
   },
   {
     id: "project-2",
-    title: "Nova Collaborative Workspace",
-    shortDesc: "Platform kolaborasi tim mirip Notion dengan editor rich-text, papan kanban interaktif, dan voice call terintegrasi.",
-    longDesc: "Nova mempermudah koordinasi tim jarak jauh. Fitur unggulannya adalah editor dokumen real-time kolaboratif (menggunakan CRDTs / Yjs) dan manajemen tugas drag-and-drop. Terintegrasi dengan WebRTC untuk voice/video channel instan tanpa perlu beralih ke aplikasi komunikasi pihak ketiga.",
-    tech: ["Next.js", "TypeScript", "Node.js", "Socket.io", "MongoDB", "Tailwind CSS"],
-    demoUrl: "https://nova-workspace.vercel.app",
-    githubUrl: "https://github.com/aryazhur/nova-workspace",
+    title: "Website Landing Page & Manejemen Admin UMKM Mulya Bakery",
+    shortDesc:
+      "Sistem e-commerce dan internal untuk modernisasi Mulya Bakery. Dilengkapi fitur ongkir otomatis berbasis jarak (Haversine), manajemen inventaris, moderasi ulasan, dan dashboard analitik penjualan terpusat.",
+    longDesc:
+      "Aplikasi web end-to-end yang dirancang untuk digitalisasi bisnis bakery. Menyediakan landing page publik dengan fitur keranjang belanja interaktif yang langsung terhubung ke WhatsApp Checkout (termasuk kalkulasi jarak otomatis menggunakan Haversine & Nominatim). Di sisi manajemen, sistem ini dilengkapi panel Admin (/admin) tangguh untuk mengelola inventaris produk, moderasi ulasan berfoto, penyesuaian biaya pengiriman pesanan, serta visualisasi laporan penjualan berkala.",
+    tech: [
+      "Next.js",
+      "TypeScript",
+      "Supabase (BaaS)",
+      "Row Level Security (RLS)",
+      "Tailwind CSS",
+      "MapLibre GL",
+      "Framer Motion",
+    ],
+    demoUrl: "https://rotimulya.vercel.app/",
+    githubUrl: "https://github.com/AzhuraaaReyy/Website_MulyaBakery", // Sesuaikan dengan repo Anda
+    mediaType: "video", // Gunakan "image" jika ingin memasang screenshot halaman login/landingnya
+    mediaUrl: "/assets/images/MulyaBakery.png", // Jalur absolut dari folder public Anda
+    featured: true,
+  },
+
+  {
+    id: "project-stunting-detection",
+    title:
+      "GrowthChildCare — Sistem Deteksi & Monitoring Stunting Anak Berbasis Rule-Based Berbasis Web",
+    shortDesc:
+      "Aplikasi Full-Stack rekam medis digital untuk deteksi dini stunting anak menggunakan mesin inferensi Rule-Based yang divalidasi dengan standar antropometri WHO.",
+    longDesc:
+      "Sistem berbasis riset yang saya bangun sebagai Proyek Tugas Akhir Universitas, bekerja sama dengan Puskesmas setempat untuk digitalisasi penanganan stunting. Mengembangkan mesin inferensi berbasis aturan (Rule-Based) yang mengintegrasikan data klinis riil Puskesmas dengan standar pertumbuhan anak World Health Organization (WHO) untuk menjamin akurasi diagnosis status gizi secara real-time. Dilengkapi dengan Dasbor Orang Tua interaktif untuk pemantauan kurva tumbuh kembang anak, serta modul generator otomatis yang memberikan rekomendasi intervensi gizi berbasis indikator stunting.",
+    tech: [
+      "Next.js (React)",
+      "Laravel (REST API)",
+      "MySQL",
+      "Tailwind CSS",
+      "Rule-Based Inference Engine",
+      "React Leaflet ",
+      "Framer Motion",
+      "React Recharts",
+    ],
+    demoUrl: "https://tugas-akhir-web-rho.vercel.app",
+    githubUrl: "https://github.com/AzhuraaaReyy/Website-Stunting-Anak",
     mediaType: "video",
-    mediaUrl: "https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-man-typing-on-a-computer-keyboard-40048-large.mp4", // Free stock video placeholder
-    featured: true
+    mediaUrl: "/assets/images/StuntingDashboard.png",
+    featured: true,
+  },
+
+  {
+    id: "project-poliklinik-laravel12",
+    title: "Sistem Informasi & Manajemen Pendaftaran Poliklinik",
+    shortDesc:
+      "Aplikasi manajemen layanan poliklinik berbasis web untuk digitalisasi sistem pendaftaran, konsultasi medis, dan pengelolaan rekam medis pasien secara terintegrasi.",
+    longDesc:
+      "Sistem manajemen poliklinik terpadu yang dirancang untuk memodernisasi layanan kesehatan konvensional. Menggunakan Laravel 12 dan Blade engine, sistem ini memfasilitasi pembuatan janji temu mandiri oleh pasien berdasarkan jadwal praktik dokter yang dinamis. Di sisi operasional, aplikasi ini menyediakan panel khusus bagi dokter untuk mengelola rekam medis (pencatatan keluhan dan diagnosis) serta memantau antrean konsultasi secara terorganisir.",
+    tech: ["Laravel 12", "Blade", "MySQL", "Bootstrap", "JavaScript", "php"],
+    demoUrl: "https://poliklinik-demo.com",
+    githubUrl: "https://github.com/AzhuraaaReyy/Sistem-Poliklinik",
+    mediaType: "video",
+    mediaUrl: "https://unsplash.com",
+    featured: false,
   },
   {
-    id: "project-3",
-    title: "Aura 3D Music Visualizer",
-    shortDesc: "Audio visualizer 3D berbasis web interaktif dengan partikel yang bereaksi terhadap frekuensi audio.",
-    longDesc: "Visualizer audio 3D real-time yang memproses file audio pengguna melalui Web Audio API dan memanipulasi ratusan ribu partikel 3D di layar menggunakan WebGL shaders. Memberikan pengalaman visual yang imersif dan terikat kuat dengan bit, melodi, serta frekuensi bass lagu.",
-    tech: ["React Three Fiber", "Three.js", "Web Audio API", "GLSL Shaders", "Tailwind CSS"],
-    demoUrl: "https://aura-3d-visualizer.vercel.app",
-    githubUrl: "https://github.com/aryazhur/aura-3d",
-    mediaType: "image",
-    mediaUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
-    featured: false
+    id: "project-ticketing-platform",
+    title: "TickeTiers — Sistem Penjualan Tiket Multi-Tier Berbasis Web",
+    shortDesc:
+      "Aplikasi full-stack manajemen dan retribusi e-ticket dengan sistem pemisahan membership (Premium & Non-Premium) serta pelacakan invoice checkout pelanggan.",
+    longDesc:
+      "Sistem e-commerce penjualan tiket yang saya bangun dari awal sebagai proyek sertifikasi Uji Pelatihan Kelulusan Universitas. Aplikasi ini mengimplementasikan logika segmentasi pengguna untuk memisahkan fitur serta aksesibilitas tiket kategori Premium dan Non-Premium. Dilengkapi dengan Dasbor Admin terpusat untuk operasi manajemen data (CRUD) inventaris tiket secara dinamis, serta halaman transaksi pelanggan yang menyajikan rincian lembar kontrol (Checkout Invoice) secara komprehensif pasca-pembelian.",
+    tech: ["Laravel 12", "Blade", "MySQL", "Tailwind CSS", "JavaScript", "php"],
+    demoUrl: "https://ticketiers-app.vercel.app",
+    githubUrl: "https://github.com/AzhuraaaReyy/Website-Penjualan-Tiket",
+    mediaType: "video",
+    mediaUrl: "/assets/images/TicketingDashboard.png",
+    featured: true,
   },
   {
-    id: "project-4",
-    title: "Apex E-Commerce Engine",
-    shortDesc: "Headless e-commerce engine berkinerja tinggi dengan multi-payment gateway dan sistem manajemen promo dinamis.",
-    longDesc: "Menyediakan API backend belanja yang sangat cepat dan aman. Mendukung integrasi Payment Gateway Midtrans, kalkulasi ongkos kirim otomatis RajaOngkir, serta caching katalog produk sensitif untuk menurunkan latency server di bawah 50ms dalam kondisi load tinggi.",
-    tech: ["NestJS", "TypeScript", "PostgreSQL", "Midtrans API", "Docker", "Redis"],
-    demoUrl: "https://apex-store-demo.vercel.app",
-    githubUrl: "https://github.com/aryazhur/apex-ecommerce",
-    mediaType: "image",
-    mediaUrl: "https://images.unsplash.com/photo-1563013544-824ae1d704d3?auto=format&fit=crop&w=800&q=80",
-    featured: false
+    id: "project-pdam-desa",
+    title: "SwadayaApps — Sistem Manajemen & Payment Gateway Billing PDAM Desa",
+    shortDesc:
+      "Aplikasi Smart-Utility full-stack untuk otomatisasi kalkulasi volume air, manajemen meteran warga, dan integrasi sistem pembayaran online (Payment Gateway) berskala desa.",
+    longDesc:
+      "Solusi infrastruktur digital nyata yang saya rancang dari nol untuk modernisasi sistem pengelolaan air bersih (PDAM) tingkat desa. Aplikasi ini mengotomatisasi konversi volume angka meteran fisik warga menjadi tagihan nominal secara presisi untuk meminimalkan salah hitung manual. Dilengkapi dengan panel manajemen data pelanggan, laporan komparatif rekap riwayat pembayaran berperiode, serta integrasi Payment Gateway komersial guna memfasilitasi transaksi tagihan bulanan warga secara online, aman, dan instan.",
+    tech: [
+      "React + TypeScript + Vite",
+      "Laravel 12",
+      "MySQL",
+      "Tailwind CSS",
+      "Payment Gateway Integration",
+      "Automated Billing Engine",
+    ],
+    demoUrl: "https://vercel.app",
+    githubUrl: "https://github.com/AzhuraaaReyy/Website-PDAM",
+    mediaType: "video",
+    mediaUrl: "/assets/images/PdamDashboard.png",
+    featured: true,
   },
-  {
-    id: "project-5",
-    title: "EcoSphere IoT Dashboard",
-    shortDesc: "Dashboard monitoring sensor kelembapan tanah dan suhu lingkungan pertanian pintar berbasis protokol MQTT.",
-    longDesc: "Dirancang untuk sektor agritech, EcoSphere menerima data telemetri dari mikrokontroler ESP32 melalui protokol MQTT. Dashboard menyajikan data sensor secara real-time dan memberikan notifikasi otomatis jika kelembapan tanah turun di bawah batas kritis.",
-    tech: ["React.js", "Node.js", "MQTT Broker", "InfluxDB", "ChartJS", "Tailwind CSS"],
-    demoUrl: "https://ecosphere-iot.vercel.app",
-    githubUrl: "https://github.com/aryazhur/ecosphere-iot",
-    mediaType: "image",
-    mediaUrl: "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?auto=format&fit=crop&w=800&q=80",
-    featured: false
-  }
 ];
 
 export const timelineData: TimelineItem[] = [
@@ -179,8 +235,8 @@ export const timelineData: TimelineItem[] = [
     points: [
       "Mengembangkan fitur dashboard analytics internal menggunakan Next.js dan TypeScript, mempercepat waktu rendering halaman sebesar 30%.",
       "Merancang ulang RESTful API krusial untuk pemrosesan pembayaran, mengurangi tingkat error transaksi bulanan dari 2.4% menjadi di bawah 0.2%.",
-      "Menulis automated testing menggunakan Jest dan React Testing Library untuk cakupan kode sebesar 85%."
-    ]
+      "Menulis automated testing menggunakan Jest dan React Testing Library untuk cakupan kode sebesar 85%.",
+    ],
   },
   {
     id: "time-2",
@@ -191,8 +247,8 @@ export const timelineData: TimelineItem[] = [
     points: [
       "Mengajar dan membimbing kelas praktikum berisikan 40+ mahasiswa dalam mempelajari HTML5, CSS3, JavaScript, dan framework React.",
       "Merancang soal ujian praktikum dan menilai proyek akhir web responsif buatan mahasiswa.",
-      "Membantu mahasiswa menguasai konsep dasar clean architecture dan pemanfaatan Git."
-    ]
+      "Membantu mahasiswa menguasai konsep dasar clean architecture dan pemanfaatan Git.",
+    ],
   },
   {
     id: "time-3",
@@ -203,7 +259,7 @@ export const timelineData: TimelineItem[] = [
     points: [
       "IPK Terakhir: 3.82 / 4.00.",
       "Fokus Penelitian / Tugas Akhir: Analisis Perbandingan Latency Sistem Microservices menggunakan gRPC vs REST API dalam Ekosistem Docker.",
-      "Aktif dalam Himpunan Mahasiswa Informatika sebagai Kepala Divisi Riset & Teknologi."
-    ]
-  }
+      "Aktif dalam Himpunan Mahasiswa Informatika sebagai Kepala Divisi Riset & Teknologi.",
+    ],
+  },
 ];
