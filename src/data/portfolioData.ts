@@ -233,16 +233,76 @@ export const timelineData: TimelineItem[] = [
     id: "time-1",
     type: "pengalaman",
     title: "Pengembang Frontend",
-    institution: "Young Bloom Studio Media Creative",
+    institution: "Young Bloom Studio Media Creative - Semarang, Jawa Tengah",
     period: "Feb 2025 - Apr 2025",
     points: [
-      "Merekayasa dan membangun antarmuka (frontend) situs web profil perusahaan serta admin dashboard interaktif menggunakan React dan Tailwind CSS.",
-      "Mengoptimalkan performa web dan memastikan aksesibilitas antarmuka 100% responsif lintas perangkat (desktop, tablet, dan mobile).",
-      "Berkolaborasi dengan tim lintas fungsi untuk menerjemahkan kebutuhan bisnis menjadi fitur web yang efisien, mudah digunakan, dan tepat waktu.",
+      "Mengembangkan antarmuka (frontend) situs web perusahaan menggunakan React dan Tailwind CSS  selama masa magang 2 bulan.",
+      "Membangun 2 modul utama, yaitu halaman profil perusahaan dan panel admin sesuai dengan kebutuhan fitur.",
+      "Memastikan tampilan halaman profil 100% responsif agar nyaman diakses di layar desktop, tablet, maupun mobile.",
+      "Bekerja sama dengan tim untuk menyesuaikan tampilan web agar sesuai dengan kebutuhan desain dan fungsi yang ditentukan.",
     ],
   },
   {
     id: "time-2",
+    type: "pengalaman",
+    title: "Full-Stack Developer — Sistem POS & Manajemen Bengkel Motor",
+    institution:
+      "Bengkel Putra Motor - Ungaran Barat, Kabupaten Semarang, Jawa Tengah",
+    period: "Agu 2026 - Sep 2026",
+    points: [
+      "Merancang dan mengembangkan aplikasi Full-Stack ERP & Point-of-Sale (POS) modular untuk otomatisasi operasional dan stok barang menggunakan React Vite, TypeScript, dan Laravel.",
+      "Mengimplementasikan sistem hak akses berbasis peran (RBAC) yang memisahkan dashboard analitik untuk Owner dan menu kasir transaksi cepat.",
+      "Mengintegrasikan Payment Gateway untuk transaksi online serta notifikasi otomatis jadwal servis berbasis WhatsApp Business API.",
+      "Membuat sistem pelacak stok barang otomatis berbasis basis data MySQL untuk mencegah kekosongan inventaris.",
+    ],
+  },
+  {
+    id: "time-3",
+    type: "pengalaman",
+    title:
+      "Full-Stack Developer — Website Landing Page & Manajemen Admin Mulya Bakery",
+    institution:
+      "Mulya Bakery - Ungaran Barat, Kabupaten Semarang, Jawa Tengah",
+    period: "Jul 2026 - Agus 2026",
+    points: [
+      "Membangun platform e-commerce dan sistem manajemen internal UMKM menggunakan React Vite, TypeScript, dan Supabase (BaaS).",
+      "Mengembangkan fitur kalkulasi ongkos kirim otomatis berbasis jarak riil menggunakan algoritma Haversine, MapLibre GL, dan Nominatim.",
+      "Membangun landing page publik interaktif dengan keranjang belanja yang terintegrasi langsung ke pemesanan via WhatsApp Checkout.",
+      "Merancang dashboard admin terpusat untuk kelola produk, moderasi ulasan berfoto, dan visualisasi laporan penjualan dengan tingkat keamanan Row Level Security (RLS) PostgreSQL.",
+    ],
+  },
+  {
+    id: "time-4",
+    type: "pengalaman",
+    title:
+      "Full-Stack Developer — GrowthChildCare, Sistem Deteksi & Monitoring Stunting Anak",
+    institution:
+      "Proyek Tugas Akhir Universitas (bekerja sama dengan Puskesmas)",
+    period: "Mar 2026 - Mei 2026",
+    points: [
+      "Mengembangkan sistem rekam medis digital dan mesin inferensi berbasis aturan (Rule-Based) untuk deteksi dini stunting sesuai standar antropometri WHO.",
+      "Membangun Dasbor Orang Tua interaktif berbasis React Recharts untuk memantau grafik tumbuh kembang anak secara visual.",
+      "Membuat modul otomatis generator rekomendasi gizi berbasis indikator hasil deteksi kondisi fisik anak.",
+      "Membuat arsitektur RESTful API dengan Laravel dan MySQL serta integrasi peta wilayah menggunakan React Leaflet.",
+    ],
+  },
+  {
+    id: "time-5",
+    type: "pengalaman",
+    title:
+      "Full-Stack Developer — SwadayaApps, Sistem Manajemen & Payment Gateway Billing PDAM Desa",
+    institution:
+      "Swadaya Air Desa Soka Lerep - Ungaran Barat, Kabupaten Semarang, Jawa Tengah",
+    period: "Mei 2026 - Jun 2026",
+    points: [
+      "Merancang aplikasi Smart-Utility untuk otomatisasi konversi angka meteran air fisik warga menjadi nilai tagihan pembayaran secara akurat.",
+      "Membangun panel kontrol manajemen data pelanggan serta laporan komparatif riwayat pembayaran bulanan.",
+      "Mengintegrasikan Payment Gateway untuk memfasilitasi transaksi pembayaran tagihan air bulanan secara instan dan aman.",
+      "Mengembangkan arsitektur aplikasi menggunakan React, TypeScript, Vite, Laravel 12, dan basis data MySQL.",
+    ],
+  },
+  {
+    id: "time-6",
     type: "pendidikan",
     title: "S1 Teknik Informatika",
     institution: "Universitas Dian Nuswantoro",
@@ -255,7 +315,7 @@ export const timelineData: TimelineItem[] = [
     ],
   },
   {
-    id: "time-3",
+    id: "time-7",
     type: "pendidikan",
     title: "SMA, Jurusan MIPA",
     institution: "SMAN 2 Ungaran",
