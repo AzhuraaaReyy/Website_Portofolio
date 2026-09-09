@@ -56,21 +56,17 @@ export function Navbar({ activeSection: activeSectionProp }: NavbarProps) {
     { label: "CO-OP", href: "#contact" },
   ];
 
-  // Sync prop external jika ada
   useEffect(() => {
     if (activeSectionProp) {
       setCurrentActive(activeSectionProp);
     }
   }, [activeSectionProp]);
 
-  // Fitur ScrollSpy: Otomatis mendeteksi section mana yang sedang aktif di layar
   useEffect(() => {
     const handleScroll = () => {
-      // Set background navbar jika di-scroll
       setScrolled(window.scrollY > 20);
 
-      // Hitung posisi scroll untuk menentukan menu aktif
-      const scrollPosition = window.scrollY + 120; // 80px offset navbar + buffer
+      const scrollPosition = window.scrollY + 120;
 
       for (let i = navLinks.length - 1; i >= 0; i--) {
         const targetId = navLinks[i].href.substring(1);
@@ -87,7 +83,7 @@ export function Navbar({ activeSection: activeSectionProp }: NavbarProps) {
     };
 
     window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Panggil sekali saat mount
+    handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, [navLinks]);
@@ -100,11 +96,11 @@ export function Navbar({ activeSection: activeSectionProp }: NavbarProps) {
     setIsOpen(false);
 
     const targetId = href.substring(1);
-    setCurrentActive(targetId); // Langsung ubah aktif saat diklik
+    setCurrentActive(targetId);
 
     const targetElement = document.querySelector(href);
     if (targetElement) {
-      const offset = 80; // tinggi sticky navbar
+      const offset = 80;
       const elementPosition = targetElement.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - offset;
 
@@ -127,17 +123,45 @@ export function Navbar({ activeSection: activeSectionProp }: NavbarProps) {
       <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blueprint-teal/50 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between relative">
-        {/* Game Logo / Player Tag */}
-        <a
-          href="#home"
-          onClick={(e) => handleLinkClick(e, "#home")}
-          className="flex items-center gap-3 group cursor-pointer skew-x-[-10deg] px-4 py-2 hover:bg-blueprint-teal/10 transition-colors border-l-4 border-blueprint-teal"
-        >
-          <Gamepad2 className="w-6 h-6 text-blueprint-teal drop-shadow-[0_0_8px_#5EEAD4] group-hover:scale-110 transition-transform" />
-          <span className="font-display font-black text-xl italic text-blueprint-text group-hover:text-blueprint-teal transition-colors tracking-wide">
-            MUHAMMAD<span className="text-blueprint-teal/50">_</span>RIZAL
-          </span>
-        </a>
+        {/* Left Side: Game Logo + Level & Rank Badge */}
+        <div className="flex items-center gap-3">
+          {/* Logo Name Tag */}
+          <a
+            href="#home"
+            onClick={(e) => handleLinkClick(e, "#home")}
+            className={`flex items-center gap-3 group cursor-pointer skew-x-[-10deg] px-4 py-2 transition-all duration-300 border-l-4 border-blueprint-teal ${
+              scrolled
+                ? "bg-blueprint-bgSec/60 hover:bg-blueprint-teal/10 border-r border-y border-blueprint-teal/20"
+                : "bg-transparent hover:bg-blueprint-teal/10 border-r-0 border-y-0"
+            }`}
+          >
+            <Gamepad2 className="w-6 h-6 text-blueprint-teal drop-shadow-[0_0_8px_#5EEAD4] group-hover:scale-110 transition-transform" />
+            <span className="font-display font-black text-xl italic text-blueprint-text group-hover:text-blueprint-teal transition-colors tracking-wide">
+              MUHAMMAD<span className="text-blueprint-teal/50">_</span>RIZAL
+            </span>
+          </a>
+
+          {/* Level & Rank Badge (Desain disamakan dengan Logo Name Tag) */}
+          <div
+            className={`hidden md:flex items-center gap-2.5 font-mono text-xs tracking-widest skew-x-[-10deg] px-4 py-2 border-l-4 border-blueprint-teal transition-all duration-300 ${
+              scrolled
+                ? "bg-blueprint-bgSec/60 border-r border-y border-blueprint-teal/20"
+                : "bg-transparent border-r-0 border-y-0"
+            }`}
+          >
+            <span className="skew-x-[10deg] flex items-center gap-2">
+              <span className="text-blueprint-textSec">LVL</span>
+              <span className="font-display font-black text-sm text-blueprint-teal">
+                99
+              </span>
+              <span className="text-blueprint-teal/30">|</span>
+              <span className="text-blueprint-textSec">RANK</span>
+              <span className="font-display font-black text-sm text-blueprint-amber">
+                S+
+              </span>
+            </span>
+          </div>
+        </div>
 
         {/* Desktop Menu - HUD Style */}
         <div className="hidden lg:flex items-center gap-4">
@@ -199,8 +223,21 @@ export function Navbar({ activeSection: activeSectionProp }: NavbarProps) {
         }`}
       >
         <div className="bg-blueprint-bg/95 backdrop-blur-lg border-b-4 border-blueprint-teal p-6 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
-          <div className="font-mono text-xs text-blueprint-teal/50 mb-4 tracking-widest uppercase">
-            Select Menu
+          <div className="flex items-center justify-between border-b border-blueprint-teal/20 pb-3 mb-4">
+            <div className="font-mono text-xs text-blueprint-teal/50 tracking-widest uppercase">
+              Select Menu
+            </div>
+            <div className="flex items-center gap-2 font-mono text-xs">
+              <span className="text-blueprint-textSec">
+                LVL{" "}
+                <strong className="text-blueprint-teal font-black">99</strong>
+              </span>
+              <span className="text-blueprint-teal/30">|</span>
+              <span className="text-blueprint-textSec">
+                RANK{" "}
+                <strong className="text-blueprint-amber font-black">S+</strong>
+              </span>
+            </div>
           </div>
           <ul className="flex flex-col gap-3 font-display font-bold">
             {navLinks.map((link) => {
