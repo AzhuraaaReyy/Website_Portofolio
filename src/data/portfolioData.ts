@@ -1,3 +1,4 @@
+import videobengkelmotor from "../../public/assets/bengkelmotor.mp4";
 export interface Profile {
   name: string;
   avatar: string;
@@ -70,7 +71,7 @@ export const skillsData: SkillCategory[] = [
   {
     title: "Frontend Development",
     skills: [
-      { name: "Next.js", level: "Mahir" },
+      { name: "React Vite", level: "Mahir" },
       { name: "Tailwind CSS", level: "Mahir" },
       { name: "Bootstrap", level: "Mahir" },
       { name: "Three.js / React Three Fiber", level: "Dasar" },
@@ -88,15 +89,17 @@ export const skillsData: SkillCategory[] = [
   {
     title: "Database Systems",
     skills: [
-      { name: "PostgreSQL", level: "Mahir" },
       { name: "MySQL", level: "Mahir" },
+      { name: "PostgreSQL", level: "Menengah" },
     ],
   },
   {
     title: "Tools & Deployment",
     skills: [
       { name: "Git / GitHub", level: "Mahir" },
-      { name: "Vercel / Netlify", level: "Mahir" },
+      { name: "Postman", level: "Mahir" },
+      { name: "Vercel", level: "Mahir" },
+      { name: "Railway", level: "Mahir" },
       { name: "Linux / Bash", level: "Menengah" },
       { name: "Docker", level: "Dasar" },
     ],
@@ -112,7 +115,7 @@ export const projectsData: Project[] = [
     longDesc:
       "Solusi digital end-to-end yang saya bangun dari awal untuk mengatasi kendala pencatatan manual pada UMKM bengkel. Sistem ini memisahkan hak akses secara dinamis: Owner dapat memantau laporan omzet real-time melalui dashboard analitik, sedangkan Kasir fokus pada transaksi penjualan cepat di menu POS. Dilengkapi dengan fitur pemantauan stok otomatis, integrasi Payment Gateway untuk pembayaran online, serta sistem booking servis yang terintegrasi langsung dengan notifikasi WhatsApp.",
     tech: [
-      "Next.js (React)",
+      "React Vite + TypeScript",
       "Laravel",
       "MySQL",
       "Tailwind CSS",
@@ -123,7 +126,7 @@ export const projectsData: Project[] = [
     githubUrl:
       "https://github.com/AzhuraaaReyy/Sistem-Manajemen-POS-BengkelMotor",
     mediaType: "video",
-    mediaUrl: "",
+    mediaUrl: videobengkelmotor,
     featured: true,
   },
   {
@@ -134,13 +137,13 @@ export const projectsData: Project[] = [
     longDesc:
       "Aplikasi web end-to-end yang dirancang untuk digitalisasi bisnis bakery. Menyediakan landing page publik dengan fitur keranjang belanja interaktif yang langsung terhubung ke WhatsApp Checkout (termasuk kalkulasi jarak otomatis menggunakan Haversine & Nominatim). Di sisi manajemen, sistem ini dilengkapi panel Admin (/admin) tangguh untuk mengelola inventaris produk, moderasi ulasan berfoto, penyesuaian biaya pengiriman pesanan, serta visualisasi laporan penjualan berkala.",
     tech: [
-      "Next.js",
-      "TypeScript",
+      "React Vite + TypeScript",
       "Supabase (BaaS)",
       "Row Level Security (RLS)",
       "Tailwind CSS",
       "MapLibre GL",
       "Framer Motion",
+      "PostgreSQL",
     ],
     demoUrl: "https://rotimulya.vercel.app/",
     githubUrl: "https://github.com/AzhuraaaReyy/Website_MulyaBakery", // Sesuaikan dengan repo Anda
@@ -158,7 +161,7 @@ export const projectsData: Project[] = [
     longDesc:
       "Sistem berbasis riset yang saya bangun sebagai Proyek Tugas Akhir Universitas, bekerja sama dengan Puskesmas setempat untuk digitalisasi penanganan stunting. Mengembangkan mesin inferensi berbasis aturan (Rule-Based) yang mengintegrasikan data klinis riil Puskesmas dengan standar pertumbuhan anak World Health Organization (WHO) untuk menjamin akurasi diagnosis status gizi secara real-time. Dilengkapi dengan Dasbor Orang Tua interaktif untuk pemantauan kurva tumbuh kembang anak, serta modul generator otomatis yang memberikan rekomendasi intervensi gizi berbasis indikator stunting.",
     tech: [
-      "Next.js (React)",
+      "React Vite + TypeScript",
       "Laravel (REST API)",
       "MySQL",
       "Tailwind CSS",
@@ -229,37 +232,39 @@ export const timelineData: TimelineItem[] = [
   {
     id: "time-1",
     type: "pengalaman",
-    title: "Full-Stack Developer Intern",
-    institution: "Tech Solutions Nusantara",
-    period: "Jul 2025 - Des 2025",
+    title: "Pengembang Frontend",
+    institution: "Young Bloom Studio Media Creative",
+    period: "Feb 2025 - Apr 2025",
     points: [
-      "Mengembangkan fitur dashboard analytics internal menggunakan Next.js dan TypeScript, mempercepat waktu rendering halaman sebesar 30%.",
-      "Merancang ulang RESTful API krusial untuk pemrosesan pembayaran, mengurangi tingkat error transaksi bulanan dari 2.4% menjadi di bawah 0.2%.",
-      "Menulis automated testing menggunakan Jest dan React Testing Library untuk cakupan kode sebesar 85%.",
+      "Merekayasa dan membangun antarmuka (frontend) situs web profil perusahaan serta admin dashboard interaktif menggunakan React dan Tailwind CSS.",
+      "Mengoptimalkan performa web dan memastikan aksesibilitas antarmuka 100% responsif lintas perangkat (desktop, tablet, dan mobile).",
+      "Berkolaborasi dengan tim lintas fungsi untuk menerjemahkan kebutuhan bisnis menjadi fitur web yang efisien, mudah digunakan, dan tepat waktu.",
     ],
   },
   {
     id: "time-2",
-    type: "pengalaman",
-    title: "Asisten Dosen Praktikum Pemrograman Web",
-    institution: "Universitas Indonesia / IT Universitas",
-    period: "Feb 2025 - Jun 2025",
+    type: "pendidikan",
+    title: "S1 Teknik Informatika",
+    institution: "Universitas Dian Nuswantoro",
+    period: "Agu 2022 - Sep 2026",
     points: [
-      "Mengajar dan membimbing kelas praktikum berisikan 40+ mahasiswa dalam mempelajari HTML5, CSS3, JavaScript, dan framework React.",
-      "Merancang soal ujian praktikum dan menilai proyek akhir web responsif buatan mahasiswa.",
-      "Membantu mahasiswa menguasai konsep dasar clean architecture dan pemanfaatan Git.",
+      "Menjalani kuliah S1 Teknik Informatika dengan capaian IPK 3,80 dari skala 4.00 (predikat Cumlaude).",
+      "Mempelajari materi utama berupa rekayasa perangkat lunak, pemograman web, basis data, dan struktur data.",
+      "Mengikuti pelatihan dan kursus mandiri di luar jam kuliah untuk menambah keterampilan pembuatan aplikasi.",
+      "Menjadi anggota komunitas Jaringan Komputer di kampus untuk mempelajari dasar-dasar infrastruktur jaringan dan IT.",
     ],
   },
   {
     id: "time-3",
     type: "pendidikan",
-    title: "Sarjana Komputer - Teknik Informatika",
-    institution: "Universitas Komputer Unggulan",
-    period: "2022 - Sekarang (Semester 8)",
+    title: "SMA, Jurusan MIPA",
+    institution: "SMAN 2 Ungaran",
+    period: "Jul 2018 - Mei 2021",
     points: [
-      "IPK Terakhir: 3.82 / 4.00.",
-      "Fokus Penelitian / Tugas Akhir: Analisis Perbandingan Latency Sistem Microservices menggunakan gRPC vs REST API dalam Ekosistem Docker.",
-      "Aktif dalam Himpunan Mahasiswa Informatika sebagai Kepala Divisi Riset & Teknologi.",
+      "Menyelesaikan pendidikan jurusan MIPA dengan nilai rata-rata Ujian Sekolah 85,00 dari skala 100.",
+      "Memperoleh nilai tertinggi pada mata pelajaran Sejarah Indonesia (89), Matematika (88), dan Kimia (88).",
+      "Mempertahankan nilai yang stabil pada seluruh mata pelajaran kelompok IPA dan mata pelajaran umum.",
+      "Mempelajari dasar-dasar logika dan pemecahan masalah melalui mata pelajaran matematika dan sains.",
     ],
   },
 ];
