@@ -1,9 +1,11 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
+import Lanyard from "./Lanyard";
 import {
   Crosshair,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Rocket,
   UserPlus,
   GraduationCap,
@@ -17,24 +19,19 @@ import {
   Mail,
   MapPin,
 } from "lucide-react";
-import { profileData, skillsData, timelineData } from "../data/portfolioData";
+import {
+  profileData,
+  timelineData,
+  aboutOverviewData,
+  arsenalData,
+  type ArsenalGroupData,
+} from "../data/portfolioData";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 import { AmbientBackground } from "./ui/AmbientBackground";
 
 /* ============================================================
-   DATA LAYER — `ABOUT_DATA`
-   Ganti isi array ini dengan data kamu. Ini SATU-SATUNYA tempat
-   merubah seluruh konten halaman About. Struktur tiap slide:
-     - id       : kode taktis singkat (misal "01")
-     - key      : label unik untuk React key / transisi
-     - label    : nama tab (muncul di bottom selector)
-     - icon     : ikon untuk tab selector
-     - accent   : "teal" | "amber" | "violet" (warna fokus slide)
-
-   Field detail setiap slide berbeda sesuai kategori — ikuti kontrak
-   tipe di bawah (AboutData) supaya bersih & reusable.
+   Interfaces & Types
    ============================================================ */
-
 interface HighlightItem {
   icon: React.ReactNode;
   label: string;
@@ -44,7 +41,7 @@ interface HighlightItem {
 interface ArsenalGroup {
   category: string;
   icon: React.ReactNode;
-  items: { name: string; tier: string; icon?: string }[];
+  items: { name: string; tier: string; icon: string }[];
 }
 
 interface MissionEntry {
@@ -61,6 +58,7 @@ interface AcademyEntry {
   org: string;
   period: string;
   note: string;
+  tag?: string[];
 }
 
 interface ContactChannel {
@@ -78,22 +76,71 @@ type AboutSlide = {
   icon: React.ReactNode;
   accent: "teal" | "amber" | "violet";
   headline: string;
-  // 01 OVERVIEW
   image?: string;
   bio?: string;
   callouts?: string[];
   highlights?: HighlightItem[];
-  // 02 SKILL_TREE
   arsenal?: ArsenalGroup[];
-  // 03 FIELD_OPS
   missions?: MissionEntry[];
-  // 04 ACADEMY
   education?: AcademyEntry[];
-  // 05 CONTACT
   channels?: ContactChannel[];
   deploy?: { label: string; href: string };
 };
 
+/* ============================================================
+   Helper Builders (Mengonversi Data dari portfolioData.ts)
+   ============================================================ */
+function renderHighlightIcon(key: string) {
+  switch (key) {
+    case "target":
+      return <Target className="w-4 h-4" />;
+    case "award":
+      return <Award className="w-4 h-4" />;
+    case "cpu":
+      return <Cpu className="w-4 h-4" />;
+    case "rocket":
+      return <Rocket className="w-4 h-4" />;
+    default:
+      return <Target className="w-4 h-4" />;
+  }
+}
+
+function renderCategoryIcon(key: string) {
+  switch (key) {
+    case "code":
+      return <Code2 className="w-4 h-4" />;
+    case "cpu":
+      return <Cpu className="w-4 h-4" />;
+    case "cloud":
+      return <Cloud className="w-4 h-4" />;
+    case "database":
+      return <Database className="w-4 h-4" />;
+    default:
+      return <Code2 className="w-4 h-4" />;
+  }
+}
+
+function formatLevelToTier(level: "Mahir" | "Menengah" | "Dasar"): string {
+  if (level === "Mahir") return "★★★★★";
+  if (level === "Menengah") return "★★★";
+  return "★★";
+}
+
+function buildArsenalFromData(data: ArsenalGroupData[]): ArsenalGroup[] {
+  return data.map((g) => ({
+    category: g.category,
+    icon: renderCategoryIcon(g.iconKey),
+    items: g.items.map((it) => ({
+      name: it.name,
+      tier: formatLevelToTier(it.level),
+      icon: it.icon,
+    })),
+  }));
+}
+
+/* ============================================================
+   Penyusunan Data Slide Dinamis
+   ============================================================ */
 const AboutData: AboutSlide[] = [
   /* ================= 01 · OVERVIEW ================= */
   {
@@ -105,32 +152,12 @@ const AboutData: AboutSlide[] = [
     headline: "Profil Ringkas",
     image: profileData.avatar,
     bio: profileData.bio,
-    callouts: [
-      profileData.tagline,
-      "Fokus membangun aplikasi web modern yang cepat, responsif, dan nyaman digunakan dari sisi antarmuka hingga basis data.",
-    ],
-    highlights: [
-      {
-        icon: <Target className="w-4 h-4" />,
-        label: "Peran Utama",
-        value: "Fullstack Developer",
-      },
-      {
-        icon: <Award className="w-4 h-4" />,
-        label: "Latar Belakang",
-        value: "Fresh Graduate",
-      },
-      {
-        icon: <Cpu className="w-4 h-4" />,
-        label: "Stack Utama",
-        value: "React · Node · Laravel",
-      },
-      {
-        icon: <Rocket className="w-4 h-4" />,
-        label: "Status",
-        value: "Siap Bekerja / Freelance",
-      },
-    ],
+    callouts: aboutOverviewData.callouts,
+    highlights: aboutOverviewData.highlights.map((h) => ({
+      icon: renderHighlightIcon(h.iconKey),
+      label: h.label,
+      value: h.value,
+    })),
   },
 
   /* ================= 02 · SKILL_TREE ================= */
@@ -141,7 +168,8 @@ const AboutData: AboutSlide[] = [
     icon: <Crosshair className="w-3.5 h-3.5" />,
     accent: "amber",
     headline: "Penguasaan Teknologi",
-    arsenal: buildArsenal(),
+    image: "",
+    arsenal: buildArsenalFromData(arsenalData),
   },
 
   /* ================= 03 · FIELD_OPS ================= */
@@ -159,7 +187,7 @@ const AboutData: AboutSlide[] = [
         org: t.institution,
         period: t.period,
         summary: t.points[0] ?? "",
-        tags: t.points.slice(1, 3),
+        tags: t.points.slice(1),
       })),
   },
 
@@ -179,6 +207,7 @@ const AboutData: AboutSlide[] = [
         org: t.institution,
         period: t.period,
         note: t.points[0] ?? "",
+        tag: t.points.slice(1),
       })),
   },
 
@@ -213,7 +242,7 @@ const AboutData: AboutSlide[] = [
       {
         icon: <MapPin className="w-4 h-4" />,
         label: "LOKASI",
-        value: "Indonesia",
+        value: aboutOverviewData.location,
         href: "#",
       },
     ],
@@ -222,132 +251,7 @@ const AboutData: AboutSlide[] = [
 ];
 
 /* ============================================================
-   Builder data dari portfolioData.ts (tetap terpusat, tidak duplikat)
-   ============================================================ */
-function buildArsenal(): ArsenalGroup[] {
-  const star = (n: number) => "★★★★★".slice(0, n);
-  const findTier = (name: string): string => {
-    const found = skillsData
-      .flatMap((c) => c.skills)
-      .find((s) => s.name === name);
-    if (!found) return "★★★★☆";
-    return found.level === "Mahir"
-      ? star(5)
-      : found.level === "Menengah"
-        ? star(4)
-        : star(3);
-  };
-
-  return [
-    {
-      category: "Frontend_Dev",
-      icon: <Code2 className="w-4 h-4" />,
-      items: [
-        {
-          name: "React.js",
-          tier: findTier("React.js"),
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
-        },
-        {
-          name: "Next.js",
-          tier: findTier("Next.js"),
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg",
-        },
-        {
-          name: "TypeScript",
-          tier: findTier("TypeScript"),
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
-        },
-        {
-          name: "Tailwind CSS",
-          tier: findTier("Tailwind CSS"),
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg",
-        },
-      ],
-    },
-    {
-      category: "Backend_Dev",
-      icon: <Cpu className="w-4 h-4" />,
-      items: [
-        {
-          name: "Laravel",
-          tier: findTier("Laravel"),
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg",
-        },
-        {
-          name: "Node.js",
-          tier: findTier("Node.js"),
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
-        },
-        {
-          name: "Express.js",
-          tier: findTier("Express.js"),
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg",
-        },
-        {
-          name: "RESTful API",
-          tier: findTier("RESTful API"),
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg",
-        },
-      ],
-    },
-    {
-      category: "Cloud_Database",
-      icon: <Cloud className="w-4 h-4" />,
-      items: [
-        {
-          name: "PostgreSQL",
-          tier: findTier("PostgreSQL"),
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
-        },
-        {
-          name: "MySQL",
-          tier: findTier("MySQL"),
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
-        },
-        {
-          name: "MongoDB",
-          tier: findTier("MongoDB"),
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg",
-        },
-        {
-          name: "Docker",
-          tier: findTier("Docker"),
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
-        },
-      ],
-    },
-    {
-      category: "Deploy_Ops",
-      icon: <Database className="w-4 h-4" />,
-      items: [
-        {
-          name: "Git / GitHub",
-          tier: findTier("Git / GitHub"),
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
-        },
-        {
-          name: "Vercel",
-          tier: findTier("Vercel"),
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vercel/vercel-original.svg",
-        },
-        {
-          name: "Supabase",
-          tier: findTier("Supabase"),
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/supabase/supabase-original.svg",
-        },
-        {
-          name: "Linux / Bash",
-          tier: findTier("Linux / Bash"),
-          icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg",
-        },
-      ],
-    },
-  ];
-}
-
-/* ============================================================
-   Warna aksen per slide (dipetakan ke theme tokens yang ada)
+   Warna Aksen Visual
    ============================================================ */
 const ACCENT = {
   teal: {
@@ -384,7 +288,7 @@ const ACCENT = {
 
 type AccentKey = (typeof AboutData)[number]["accent"];
 
-/* Brand icons (lucide-react version doesn't ship Github/Linkedin) */
+/* Brand Icons */
 function GithubIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -421,7 +325,7 @@ function LinkedinIcon({ className }: { className?: string }) {
 }
 
 /* ============================================================
-   Reusable HUD building blocks
+   Reusable HUD Building Blocks
    ============================================================ */
 function HudOverlay() {
   return (
@@ -453,7 +357,7 @@ function Silhouette({
   const c = ACCENT[accent];
   return (
     <svg
-      className={`w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 ${c.text} relative z-10 drop-shadow-[0_0_25px_currentColor]`}
+      className={`w-36 h-36 sm:w-48 sm:h-48 md:w-56 md:h-56 ${c.text} relative z-10 drop-shadow-[0_0_25px_currentColor]`}
       viewBox="0 0 100 100"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -605,7 +509,7 @@ export function About() {
   return (
     <section
       id="about"
-      className="relative py-16 md:py-24 bg-blueprint-bg overflow-hidden section-scroll border-t border-blueprint-teal/20"
+      className="relative min-h-screen flex flex-col justify-between overflow-hidden section-scroll border-t border-blueprint-teal/20 bg-blueprint-bg"
     >
       <AmbientBackground
         glowIntensity={0.18}
@@ -614,16 +518,16 @@ export function About() {
       />
       <div className="absolute inset-0 bg-blueprint-grid bg-grid-size opacity-20 pointer-events-none mix-blend-screen" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 flex-1 flex flex-col justify-between pt-20 pb-8">
         {/* ================= SECTION HEADER ================= */}
-        <div className="mb-8 md:mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div className="mb-4 md:mb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-2 shrink-0">
           <div>
-            <div className="flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase text-blueprint-teal mb-2">
+            <div className="flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase text-blueprint-teal mb-1.5">
               <span className="bg-blueprint-teal/10 border border-blueprint-teal/30 px-2 py-0.5">
                 Ringkasan Portofolio
               </span>
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-blueprint-text tracking-tight uppercase italic">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-blueprint-text tracking-tight uppercase italic">
               Operator <span className={accent.text}>{active.label}</span>
             </h2>
           </div>
@@ -645,34 +549,53 @@ export function About() {
             initial="enter"
             animate="center"
             exit="exit"
-            className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8"
+            className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start my-auto w-full"
           >
             {/* ---------- LEFT: Character / Visual Panel ---------- */}
-            <div className="lg:col-span-5 flex flex-col gap-5">
+            <div className="lg:col-span-5 flex flex-col gap-4">
               <div
-                className={`relative flex-1 aspect-[4/5] sm:aspect-[5/6] bg-blueprint-bgSec/40 backdrop-blur-md border ${accent.border} ${accent.glow} overflow-hidden flex items-center justify-center transition-shadow duration-500`}
+                className={`relative flex-1 min-h-[280px] max-h-[380px] sm:max-h-[420px] lg:max-h-[460px] aspect-[4/5] sm:aspect-[5/6] bg-blueprint-bgSec/40 backdrop-blur-md border ${accent.border} ${accent.glow} overflow-hidden flex items-center justify-center transition-shadow duration-500`}
               >
+                {/* Overlay Scanline & Efek HUD */}
                 <HudOverlay />
-                {active.image ? (
+
+                {/* LOGIKA KONTEN PANEL VISUAL */}
+                {active.key === "overview" ? (
+                  /* KONTEN LANYARD 3D KHUSUS SLIDE TENTANG SAYA */
+                  <div className="relative z-10 w-full h-full flex items-center justify-center pointer-events-auto">
+                    <Lanyard
+                      position={[0, 0, 16]}
+                      gravity={[0, -40, 0]}
+                      frontImage={active.image || profileData.avatar}
+                      backImage={active.image || profileData.avatar}
+                      imageFit="cover"
+                      lanyardWidth={1.5}
+                    />
+                  </div>
+                ) : active.image ? (
+                  /* GAMBAR BIASA UNTUK OPERATOR LAIN JIKA TERSEDIA PROPERTI IMAGE */
                   <div className="relative z-10 flex items-center justify-center w-full h-full p-4">
                     <img
                       src={active.image}
-                      alt={profileData.name}
+                      alt={active.label}
                       className="w-auto h-full max-h-full object-contain object-center grayscale-[30%] contrast-[1.1] brightness-[0.85] saturate-[0.9]"
                     />
                   </div>
                 ) : (
+                  /* SILUET ANIMASI HUD SEBAGAI FALLBACK JIKA TIDAK ADA GAMBAR */
                   <Silhouette accent={active.accent} reduced={reducedMotion} />
                 )}
-                <div className="absolute bottom-3 left-3 z-20 font-mono text-[9px] text-blueprint-teal/80 bg-blueprint-bg/70 backdrop-blur-sm border border-blueprint-teal/20 px-2 py-1">
+
+                {/* Metadata HUD Label */}
+                <div className="absolute bottom-3 left-3 z-20 font-mono text-[9px] text-blueprint-teal/80 bg-blueprint-bg/70 backdrop-blur-sm border border-blueprint-teal/20 px-2 py-1 pointer-events-none">
                   SLIDE: {active.id}-{active.label.toUpperCase()}
                 </div>
-                <div className="absolute top-3 right-3 z-20 font-mono text-[9px] text-blueprint-textSec">
+                <div className="absolute top-3 right-3 z-20 font-mono text-[9px] text-blueprint-textSec pointer-events-none">
                   {active.headline}
                 </div>
               </div>
 
-              {/* Arrow controls (desktop-side quick nav) */}
+              {/* Control Navigasi Slide Arrow */}
               <div className="flex items-center justify-between gap-3">
                 <NavArrow
                   dir="prev"
@@ -685,7 +608,11 @@ export function About() {
                       key={s.key}
                       onClick={() => setActiveIndex(i)}
                       aria-label={`Go to ${s.label}`}
-                      className={`h-1.5 transition-all duration-300 cursor-pointer ${i === activeIndex ? `w-8 ${accent.bar}` : "w-4 bg-blueprint-bgSec border border-blueprint-teal/20 hover:border-blueprint-teal/50"}`}
+                      className={`h-1.5 transition-all duration-300 cursor-pointer ${
+                        i === activeIndex
+                          ? `w-8 ${accent.bar}`
+                          : "w-4 bg-blueprint-bgSec border border-blueprint-teal/20 hover:border-blueprint-teal/50"
+                      }`}
                     />
                   ))}
                 </div>
@@ -703,27 +630,31 @@ export function About() {
               variants={listVariants}
               initial="hidden"
               animate="show"
-              className="lg:col-span-7 flex flex-col"
+              className="lg:col-span-7 flex flex-col max-h-[440px] sm:max-h-[480px] lg:max-h-[500px] overflow-y-auto pr-1.5 hide-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             >
               {/* Slide 01 · OVERVIEW */}
               {active.bio && (
                 <>
-                  <Panel className="mb-5">
+                  <Panel className="mb-4">
                     <BlockHeader
                       accent={active.accent}
                       title="Professional_Summary"
                     />
-                    <p className="text-sm sm:text-[15px] text-blueprint-textSec leading-relaxed">
+                    <p className="text-xs sm:text-sm text-blueprint-textSec leading-relaxed text-justify">
                       {active.bio}
                     </p>
                   </Panel>
                   {active.callouts && (
-                    <div className="flex flex-col gap-2 mb-5">
+                    <div className="flex flex-col gap-2 mb-4">
                       {active.callouts.map((c, i) => (
                         <motion.div
                           key={i}
                           variants={itemVariants}
-                          className={`flex items-start gap-2 text-[13px] font-mono ${i === 0 ? "text-blueprint-teal" : "text-blueprint-textSec"} border-l-2 border-blueprint-teal/30 pl-3`}
+                          className={`flex items-start gap-2 text-[12px] sm:text-[13px] font-mono ${
+                            i === 0
+                              ? "text-blueprint-teal"
+                              : "text-blueprint-textSec"
+                          } border-l-2 border-blueprint-teal/30 pl-3`}
                         >
                           <span className="mt-px">▸</span>
                           <span className="italic">“{c}”</span>
@@ -737,13 +668,13 @@ export function About() {
                         <motion.div
                           key={i}
                           variants={itemVariants}
-                          className={`bg-blueprint-bgSec/50 backdrop-blur-sm border ${accent.border} ${accent.hoverBd} p-4 transition-colors`}
+                          className={`bg-blueprint-bgSec/50 backdrop-blur-sm border ${accent.border} ${accent.hoverBd} p-3 sm:p-4 transition-colors`}
                         >
-                          <div className={`${accent.text} mb-2`}>{h.icon}</div>
+                          <div className={`${accent.text} mb-1.5`}>{h.icon}</div>
                           <div className="font-mono text-[9px] text-blueprint-textSec uppercase tracking-widest mb-1">
                             {h.label}
                           </div>
-                          <div className="font-display font-bold text-blueprint-text text-sm">
+                          <div className="font-display font-bold text-blueprint-text text-xs sm:text-sm">
                             {h.value}
                           </div>
                         </motion.div>
@@ -754,47 +685,46 @@ export function About() {
               )}
 
               {/* Slide 02 · SKILL_TREE */}
-              {/* Slide 02 · SKILL_TREE */}
               {active.arsenal && (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3.5">
                   <Panel>
-                    <p className="text-sm text-blueprint-textSec leading-relaxed">
+                    <p className="text-xs sm:text-sm text-blueprint-textSec leading-relaxed text-justify">
                       Daftar teknologi dan alat pengembang yang biasa saya
                       gunakan dalam membangun aplikasi web modern, baik dari
                       sisi antarmuka maupun logika server.
                     </p>
                   </Panel>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {active.arsenal.map((g) => (
                       <motion.div key={g.category} variants={itemVariants}>
                         <Panel className="h-full">
-                          <div className="flex items-center gap-2 mb-4 border-b border-blueprint-teal/15 pb-2">
+                          <div className="flex items-center gap-2 mb-3 border-b border-blueprint-teal/15 pb-2">
                             <span className={accent.text}>{g.icon}</span>
                             <h4 className="font-display font-bold text-xs uppercase tracking-widest text-blueprint-text">
                               {g.category.replace("_", " ")}
                             </h4>
                           </div>
 
-                          <div className="grid grid-cols-1 gap-2.5">
+                          <div className="grid grid-cols-1 gap-2">
                             {g.items.map((it) => (
                               <div
                                 key={it.name}
-                                className="group flex items-center justify-between gap-3 p-2 rounded bg-blueprint-bg/50 border border-blueprint-teal/10 hover:border-blueprint-teal/40 transition-all"
+                                className="group flex items-center justify-between gap-2.5 p-2 rounded bg-blueprint-bg/50 border border-blueprint-teal/10 hover:border-blueprint-teal/40 transition-all"
                               >
-                                <div className="flex items-center gap-2.5 min-w-0">
+                                <div className="flex items-center gap-2 min-w-0">
                                   <img
                                     src={it.icon}
                                     alt={it.name}
-                                    className="w-5 h-5 object-contain shrink-0 filter drop-shadow-sm group-hover:scale-110 transition-transform"
+                                    className="w-4 h-4 object-contain shrink-0 filter drop-shadow-sm group-hover:scale-110 transition-transform"
                                     loading="lazy"
                                   />
-                                  <span className="font-mono text-xs text-blueprint-text group-hover:text-blueprint-teal transition-colors truncate">
+                                  <span className="font-mono text-[11px] sm:text-xs text-blueprint-text group-hover:text-blueprint-teal transition-colors truncate">
                                     {it.name}
                                   </span>
                                 </div>
                                 <span
-                                  className={`font-mono text-[10px] ${accent.text} shrink-0`}
+                                  className={`font-mono text-[9px] sm:text-[10px] ${accent.text} shrink-0`}
                                 >
                                   {it.tier}
                                 </span>
@@ -810,58 +740,125 @@ export function About() {
 
               {/* Slide 03 · FIELD_OPS */}
               {active.missions && (
-                <div className="relative flex flex-col gap-4 pl-6 border-l-2 border-blueprint-teal/20">
-                  {active.missions.map((m, i) => (
-                    <motion.div
-                      key={i}
-                      variants={itemVariants}
-                      className="relative"
-                    >
-                      <span
-                        className={`absolute -left-[27px] top-1.5 w-2.5 h-2.5 rounded-full ${accent.dot} shadow-[0_0_8px_currentColor]`}
-                      />
-                      <Panel className="hover:border-blueprint-teal/40 transition-colors">
-                        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                          <h4 className="font-display font-bold text-blueprint-text text-sm uppercase tracking-wide">
-                            {m.role}
-                          </h4>
-                          <span
-                            className={`font-mono text-[10px] ${accent.chip} px-2 py-0.5`}
-                          >
-                            {m.period}
-                          </span>
-                        </div>
-                        <div className="font-mono text-[10px] text-blueprint-teal/70 mb-2">
-                          {m.org}
-                        </div>
-                        <p className="text-[13px] text-blueprint-textSec leading-relaxed mb-2">
-                          {m.summary}
-                        </p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {m.tags.map((t) => (
+                <div className="relative flex flex-col gap-3.5 pl-6 border-l-2 border-blueprint-teal/20">
+                  {active.missions.slice(0, 3).map((m, i) => {
+                    const isThird = i === 2;
+
+                    // Render Kartu ke-3 (Setengah Terpotong + Blurred / Faded + Overlay Button)
+                    if (isThird) {
+                      return (
+                        <motion.div
+                          key={i}
+                          variants={itemVariants}
+                          className="relative group"
+                        >
+                          <div className="relative max-h-[90px] overflow-hidden opacity-40 blur-[1px] select-none pointer-events-none">
                             <span
-                              key={t}
-                              className="font-mono text-[9px] text-blueprint-textSec bg-blueprint-bg/60 border border-blueprint-teal/10 px-2 py-0.5"
+                              className={`absolute -left-[27px] top-1.5 w-2.5 h-2.5 rounded-full ${accent.dot} shadow-[0_0_8px_currentColor]`}
+                            />
+                            <Panel>
+                              <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                                <h4 className="font-display font-bold text-blueprint-text text-xs sm:text-sm uppercase tracking-wide">
+                                  {m.role}
+                                </h4>
+                                <span
+                                  className={`font-mono text-[10px] ${accent.chip} px-2 py-0.5`}
+                                >
+                                  {m.period}
+                                </span>
+                              </div>
+                              <div className="font-mono text-[10px] text-blueprint-teal/70 mb-1.5">
+                                {m.org}
+                              </div>
+                              <p className="text-xs text-blueprint-textSec leading-relaxed mb-2 text-justify">
+                                {m.summary}
+                              </p>
+                              <div className="flex flex-wrap gap-1.5">
+                                {m.tags.map((t) => (
+                                  <span
+                                    key={t}
+                                    className="font-mono text-[9px] text-blueprint-textSec bg-blueprint-bg/60 border border-blueprint-teal/10 px-2 py-0.5"
+                                  >
+                                    {t}
+                                  </span>
+                                ))}
+                              </div>
+                            </Panel>
+                          </div>
+
+                          {/* Overlay Gradien Pudar & Tombol Scroll ke #experience */}
+                          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blueprint-bg/70 to-blueprint-bg flex items-end justify-center pt-6">
+                            <button
+                              onClick={() => {
+                                const el =
+                                  document.getElementById("experience");
+                                if (el) {
+                                  el.scrollIntoView({ behavior: "smooth" });
+                                }
+                              }}
+                              className="group w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-blueprint-bgSec/90 hover:bg-blueprint-teal/20 border border-blueprint-teal/50 hover:border-blueprint-teal text-blueprint-teal font-mono text-xs uppercase tracking-widest backdrop-blur-md transition-all duration-300 cursor-pointer shadow-[0_0_15px_rgba(94,234,212,0.2)] hover:shadow-[0_0_25px_rgba(94,234,212,0.4)]"
                             >
-                              {t}
+                              <span>Lihat Semua Pengalaman</span>
+                              <ChevronDown className="w-4 h-4 group-hover:translate-y-1 transition-transform duration-300" />
+                            </button>
+                          </div>
+                        </motion.div>
+                      );
+                    }
+
+                    // Render Kartu Normal (Kartu 1 & 2)
+                    return (
+                      <motion.div
+                        key={i}
+                        variants={itemVariants}
+                        className="relative"
+                      >
+                        <span
+                          className={`absolute -left-[27px] top-1.5 w-2.5 h-2.5 rounded-full ${accent.dot} shadow-[0_0_8px_currentColor]`}
+                        />
+                        <Panel className="hover:border-blueprint-teal/40 transition-colors">
+                          <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                            <h4 className="font-display font-bold text-blueprint-text text-xs sm:text-sm uppercase tracking-wide">
+                              {m.role}
+                            </h4>
+                            <span
+                              className={`font-mono text-[10px] ${accent.chip} px-2 py-0.5`}
+                            >
+                              {m.period}
                             </span>
-                          ))}
-                        </div>
-                      </Panel>
-                    </motion.div>
-                  ))}
+                          </div>
+                          <div className="font-mono text-[10px] text-blueprint-teal/70 mb-1.5">
+                            {m.org}
+                          </div>
+                          <p className="text-xs text-blueprint-textSec leading-relaxed mb-2 text-justify">
+                            {m.summary}
+                          </p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {m.tags.map((t) => (
+                              <span
+                                key={t}
+                                className="font-mono text-[9px] text-blueprint-textSec bg-blueprint-bg/60 border border-blueprint-teal/10 px-2 py-0.5"
+                              >
+                                {t}
+                              </span>
+                            ))}
+                          </div>
+                        </Panel>
+                      </motion.div>
+                    );
+                  })}
                 </div>
               )}
 
               {/* Slide 04 · ACADEMY */}
               {active.education && (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3.5">
                   {active.education.map((e, i) => (
                     <motion.div key={i} variants={itemVariants}>
                       <Panel className={`border-l-4 ${accent.border}`}>
-                        <div className="pl-4">
+                        <div className="pl-2.5 sm:pl-4">
                           <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
-                            <h4 className="font-display font-bold text-blueprint-text text-sm uppercase tracking-wide">
+                            <h4 className="font-display font-bold text-blueprint-text text-xs sm:text-sm uppercase tracking-wide">
                               {e.title}
                             </h4>
                             <span
@@ -870,34 +867,41 @@ export function About() {
                               {e.period}
                             </span>
                           </div>
-                          <div className="font-mono text-[10px] text-blueprint-teal/70 mb-2">
+                          <div className="font-mono text-[10px] text-blueprint-teal/70 mb-1.5">
                             {e.org}
                           </div>
-                          <p className="text-[13px] text-blueprint-textSec leading-relaxed">
+                          <p className="text-xs text-blueprint-textSec leading-relaxed mb-2.5 text-justify">
                             {e.note}
                           </p>
+                          {e.tag && e.tag.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5">
+                              {e.tag.map((t) => (
+                                <span
+                                  key={t}
+                                  className="font-mono text-[9px] text-blueprint-textSec bg-blueprint-bg/60 border border-blueprint-teal/10 px-2 py-0.5"
+                                >
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </Panel>
                     </motion.div>
                   ))}
                   <motion.div variants={itemVariants}>
                     <div
-                      className={`border ${accent.border} p-4 flex items-start gap-3`}
+                      className={`border ${accent.border} p-3.5 flex items-start gap-3`}
                     >
                       <Award
                         className={`w-5 h-5 ${accent.text} shrink-0 mt-0.5`}
                       />
                       <div>
-                        <div className="font-mono text-[10px] text-blueprint-text uppercase tracking-widest mb-1">
+                        <div className="font-mono text-[10px] text-blueprint-text uppercase tracking-widest mb-1.5">
                           Pelatihan & Sertifikasi Teknis
                         </div>
                         <div className="flex flex-wrap gap-1.5">
-                          {[
-                            "Dicoding",
-                            "IDCamp",
-                            "React Advanced",
-                            "UI/UX Path",
-                          ].map((c) => (
+                          {aboutOverviewData.certifications.map((c) => (
                             <span
                               key={c}
                               className="font-mono text-[9px] text-blueprint-textSec bg-blueprint-bg/60 border border-blueprint-teal/10 px-2 py-0.5"
@@ -914,7 +918,7 @@ export function About() {
 
               {/* Slide 05 · CONTACT_HQ */}
               {active.channels && (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3.5">
                   <Panel>
                     <BlockHeader
                       accent={active.accent}
@@ -929,7 +933,7 @@ export function About() {
                             ch.href.startsWith("http") ? "_blank" : undefined
                           }
                           rel="noreferrer"
-                          className={`flex items-center gap-3 border px-4 py-3 transition-all cursor-pointer ${
+                          className={`flex items-center gap-3 border px-3.5 py-2.5 transition-all cursor-pointer ${
                             ch.primary
                               ? `border-blueprint-teal ${accent.bgSoft} ${accent.text} ${accent.hoverBd}`
                               : "border-blueprint-teal/15 text-blueprint-textSec hover:border-blueprint-teal/40 hover:text-blueprint-text"
@@ -952,7 +956,7 @@ export function About() {
                   {active.deploy && (
                     <a
                       href={active.deploy.href}
-                      className="group relative flex items-center justify-center gap-2 bg-blueprint-teal text-blueprint-bg font-display font-black text-sm px-6 py-4 skew-x-[-8deg] hover:bg-white transition-all shadow-[0_0_22px_rgba(94,234,212,0.45)] hover:shadow-[0_0_34px_rgba(94,234,212,0.8)] cursor-pointer"
+                      className="group relative flex items-center justify-center gap-2 bg-blueprint-teal text-blueprint-bg font-display font-black text-xs sm:text-sm px-5 py-3.5 skew-x-[-8deg] hover:bg-white transition-all shadow-[0_0_22px_rgba(94,234,212,0.45)] hover:shadow-[0_0_34px_rgba(94,234,212,0.8)] cursor-pointer"
                     >
                       <span className="skew-x-[8deg] flex items-center gap-2">
                         <Rocket className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
@@ -967,9 +971,9 @@ export function About() {
         </AnimatePresence>
 
         {/* ================= SINGLE BOTTOM SELECTOR ================= */}
-        <div className="mt-8 md:mt-10 flex flex-col lg:flex-row items-stretch lg:items-center gap-3 border-t border-blueprint-teal/20 pt-5">
+        <div className="mt-4 md:mt-6 flex flex-col lg:flex-row items-stretch lg:items-center gap-3 border-t border-blueprint-teal/20 pt-4 shrink-0">
           {/* Tab selector */}
-          <div className="flex flex-1 gap-2 overflow-x-auto pb-1">
+          <div className="flex flex-1 gap-2 overflow-x-auto pb-1 hide-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {AboutData.map((s, i) => {
               const isActive = i === activeIndex;
               const sc = ACCENT[s.accent];
@@ -977,7 +981,7 @@ export function About() {
                 <button
                   key={s.key}
                   onClick={() => setActiveIndex(i)}
-                  className={`group relative flex items-center gap-1.5 shrink-0 px-3 sm:px-4 py-2.5 border transition-all duration-300 cursor-pointer ${
+                  className={`group relative flex items-center gap-1.5 shrink-0 px-3 sm:px-4 py-2 border transition-all duration-300 cursor-pointer ${
                     isActive
                       ? `${sc.border} ${sc.text} bg-blueprint-bgSec/70`
                       : "border-blueprint-teal/15 text-blueprint-textSec bg-blueprint-bgSec/30 hover:border-blueprint-teal/40 hover:text-blueprint-text"
@@ -1020,7 +1024,7 @@ export function About() {
 }
 
 /* ============================================================
-   Nav arrow button (reusable)
+   Nav Arrow Button Component
    ============================================================ */
 function NavArrow({
   dir,
@@ -1040,7 +1044,7 @@ function NavArrow({
       disabled={disabled}
       aria-label={dir === "prev" ? "Previous slide" : "Next slide"}
       className={`group flex items-center gap-2 border font-mono text-xs uppercase tracking-widest transition-all cursor-pointer ${
-        compact ? "px-3 py-2.5" : "px-4 py-2"
+        compact ? "px-3 py-2" : "px-4 py-2"
       } ${
         disabled
           ? "border-blueprint-teal/10 text-blueprint-textSec/40 cursor-not-allowed"

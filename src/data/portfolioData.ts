@@ -1,4 +1,5 @@
 import videobengkelmotor from "../../public/assets/bengkelmotor.mp4";
+
 export interface Profile {
   name: string;
   avatar: string;
@@ -31,7 +32,7 @@ export interface Project {
   demoUrl: string;
   githubUrl: string;
   mediaType: "image" | "video";
-  mediaUrl: string; // Placeholder path
+  mediaUrl: string;
   featured: boolean;
 }
 
@@ -44,19 +45,192 @@ export interface TimelineItem {
   points: string[];
 }
 
+export interface HighlightItem {
+  iconKey: "target" | "award" | "cpu" | "rocket";
+  label: string;
+  value: string;
+}
+
+export interface AboutOverviewData {
+  highlights: HighlightItem[];
+  callouts: string[];
+  location: string;
+  certifications: string[];
+}
+
+export interface ArsenalItem {
+  name: string;
+  level: "Mahir" | "Menengah" | "Dasar";
+  icon: string;
+}
+
+export interface ArsenalGroupData {
+  category: string;
+  iconKey: "code" | "cpu" | "cloud" | "database";
+  items: ArsenalItem[];
+}
+
 export const profileData: Profile = {
   name: "Muhammad Rizal",
   avatar: "/assets/images/Foto1.jpeg",
   role: "Full-Stack Engineer",
   tagline:
-    "Merancang arsitektur perangkat lunak scalable dan antarmuka presisi untuk performa optimal",
-  bio: "Seorang Full-Stack Engineer dengan spesialisasi dalam rekayasa perangkat lunak modern. Memiliki keahlian mendalam dalam merancang arsitektur web modular, mengoptimalkan database relasional, dan menciptakan antarmuka interaktif. Berpengalaman mengeksekusi proyek kompleks dari fase perancangan sistem hingga deployment berskala produksi.",
+    "Full-Stack Web Developer yang berfokus pada efisiensi alur bisnis dan kualitas antarmuka web.",
+  bio: "Fresh Graduate Software Engineer lulusan S1 Teknik Informatika UDINUS (IPK 3,80/4.00, Cumlaude) dengan spesialisasi pengembangan web fullstack. Berpengalaman membangun solusi perangkat lunak secara end-to-end mulai dari perancangan UI/UX yang responsif menggunakan React dan Tailwind CSS, hingga pengembangan backend & basis data berbasis Laravel, Supabase, dan PostgreSQL. Memiliki pengalaman nyata mengintegrasikan RESTful API, sistem pakar berbasis logika komputasi (rule-based system), serta otomatisasi alur bisnis pada berbagai proyek web.",
   cvUrl: "/cv-placeholder.pdf",
-  email: "mailto:muhammadrizal52@gmail.com",
-  whatsapp: "https://wa.me/6283162253730", // Placeholder WA link
-  github: "https://github.com/AzhuraaaReyy", // Placeholder Github link
-  linkedin: "https://linkedin.com/in/aryazhur", // Placeholder Linkedin link
+  email: "muhammadrizal52@gmail.com",
+  whatsapp: "https://wa.me/6283162253730",
+  github: "https://github.com/AzhuraaaReyy",
+  linkedin: "https://linkedin.com/in/aryazhur",
 };
+
+export const aboutOverviewData: AboutOverviewData = {
+  highlights: [
+    {
+      iconKey: "target",
+      label: "Peran Utama",
+      value: "Fullstack Developer",
+    },
+    {
+      iconKey: "award",
+      label: "Latar Belakang",
+      value: "Fresh Graduate",
+    },
+    {
+      iconKey: "cpu",
+      label: "Stack Utama",
+      value: "React · Laravel · Supabase",
+    },
+    {
+      iconKey: "rocket",
+      label: "Status",
+      value: "Siap Bekerja / Freelance",
+    },
+  ],
+  callouts: [
+    profileData.tagline,
+    "Terbiasa membangun antarmuka web yang responsif, mengintegrasikan RESTful API, dan mengelola logika basis data di sisi server.",
+  ],
+  location: "Ungaran Barat, Kabupaten Semarang, Jawa Tengah",
+  certifications: [
+    "Dicoding Indonesia",
+    "IDCamp 2024",
+    "Coding Camp DBS Foundation",
+    "React & Web Development",
+  ],
+};
+
+export const arsenalData: ArsenalGroupData[] = [
+  {
+    category: "Frontend_Dev",
+    iconKey: "code",
+    items: [
+      {
+        name: "React Vite",
+        level: "Mahir",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+      },
+      {
+        name: "TypeScript",
+        level: "Mahir",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
+      },
+      {
+        name: "Tailwind CSS",
+        level: "Mahir",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg",
+      },
+      {
+        name: "Bootstrap",
+        level: "Mahir",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg",
+      },
+      {
+        name: "HTML",
+        level: "Mahir",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
+      },
+    ],
+  },
+  {
+    category: "Backend_Dev",
+    iconKey: "cpu",
+    items: [
+      {
+        name: "Laravel",
+        level: "Mahir",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg",
+      },
+      {
+        name: "PHP",
+        level: "Mahir",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg",
+      },
+      {
+        name: "RESTful API",
+        level: "Mahir",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg",
+      },
+      {
+        name: "JavaScript",
+        level: "Mahir",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+      },
+    ],
+  },
+  {
+    category: "Cloud_Database",
+    iconKey: "cloud",
+    items: [
+      {
+        name: "MySQL",
+        level: "Mahir",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
+      },
+      {
+        name: "PostgreSQL",
+        level: "Menengah",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+      },
+      {
+        name: "Supabase",
+        level: "Mahir",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/supabase/supabase-original.svg",
+      },
+      {
+        name: "Docker",
+        level: "Dasar",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+      },
+    ],
+  },
+  {
+    category: "Deploy_Ops",
+    iconKey: "database",
+    items: [
+      {
+        name: "Git / GitHub",
+        level: "Mahir",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+      },
+      {
+        name: "Vercel",
+        level: "Mahir",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vercel/vercel-original.svg",
+      },
+      {
+        name: "Railway",
+        level: "Mahir",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/railway/railway-original.svg",
+      },
+      {
+        name: "Linux / Bash",
+        level: "Menengah",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg",
+      },
+    ],
+  },
+];
 
 export const skillsData: SkillCategory[] = [
   {
@@ -146,12 +320,11 @@ export const projectsData: Project[] = [
       "PostgreSQL",
     ],
     demoUrl: "https://rotimulya.vercel.app/",
-    githubUrl: "https://github.com/AzhuraaaReyy/Website_MulyaBakery", // Sesuaikan dengan repo Anda
-    mediaType: "video", // Gunakan "image" jika ingin memasang screenshot halaman login/landingnya
-    mediaUrl: "/assets/images/MulyaBakery.png", // Jalur absolut dari folder public Anda
+    githubUrl: "https://github.com/AzhuraaaReyy/Website_MulyaBakery",
+    mediaType: "video",
+    mediaUrl: "/assets/images/MulyaBakery.png",
     featured: true,
   },
-
   {
     id: "project-stunting-detection",
     title:
@@ -176,7 +349,6 @@ export const projectsData: Project[] = [
     mediaUrl: "/assets/images/StuntingDashboard.png",
     featured: true,
   },
-
   {
     id: "project-poliklinik-laravel12",
     title: "Sistem Informasi & Manajemen Pendaftaran Poliklinik",
@@ -236,7 +408,8 @@ export const timelineData: TimelineItem[] = [
     institution: "Young Bloom Studio Media Creative - Semarang, Jawa Tengah",
     period: "Feb 2025 - Apr 2025",
     points: [
-      "Mengembangkan antarmuka (frontend) situs web perusahaan menggunakan React dan Tailwind CSS  selama masa magang 2 bulan.",
+      "Pengalaman magang 2 bulan di Young Bloom Studio ini jadi kesempatan pertama saya terjun langsung ke industri sebagai Frontend Developer.",
+      "Mengembangkan antarmuka (frontend) situs web perusahaan menggunakan React dan Tailwind CSS selama masa magang 2 bulan.",
       "Membangun 2 modul utama, yaitu halaman profil perusahaan dan panel admin sesuai dengan kebutuhan fitur.",
       "Memastikan tampilan halaman profil 100% responsif agar nyaman diakses di layar desktop, tablet, maupun mobile.",
       "Bekerja sama dengan tim untuk menyesuaikan tampilan web agar sesuai dengan kebutuhan desain dan fungsi yang ditentukan.",
@@ -250,6 +423,7 @@ export const timelineData: TimelineItem[] = [
       "Bengkel Putra Motor - Ungaran Barat, Kabupaten Semarang, Jawa Tengah",
     period: "Agu 2026 - Sep 2026",
     points: [
+      "Proyek ini saya kerjakan untuk membantu Bengkel Putra Motor merapikan operasional bengkel, mulai dari kasir POS hingga manajemen stok otomatis.",
       "Merancang dan mengembangkan aplikasi Full-Stack ERP & Point-of-Sale (POS) modular untuk otomatisasi operasional dan stok barang menggunakan React Vite, TypeScript, dan Laravel.",
       "Mengimplementasikan sistem hak akses berbasis peran (RBAC) yang memisahkan dashboard analitik untuk Owner dan menu kasir transaksi cepat.",
       "Mengintegrasikan Payment Gateway untuk transaksi online serta notifikasi otomatis jadwal servis berbasis WhatsApp Business API.",
@@ -265,6 +439,7 @@ export const timelineData: TimelineItem[] = [
       "Mulya Bakery - Ungaran Barat, Kabupaten Semarang, Jawa Tengah",
     period: "Jul 2026 - Agus 2026",
     points: [
+      "Saya membangun platform web dan sistem admin internal Mulya Bakery untuk memudahkan penjualan produk online serta pencatatan stok UMKM.",
       "Membangun platform e-commerce dan sistem manajemen internal UMKM menggunakan React Vite, TypeScript, dan Supabase (BaaS).",
       "Mengembangkan fitur kalkulasi ongkos kirim otomatis berbasis jarak riil menggunakan algoritma Haversine, MapLibre GL, dan Nominatim.",
       "Membangun landing page publik interaktif dengan keranjang belanja yang terintegrasi langsung ke pemesanan via WhatsApp Checkout.",
@@ -280,6 +455,7 @@ export const timelineData: TimelineItem[] = [
       "Proyek Tugas Akhir Universitas (bekerja sama dengan Puskesmas)",
     period: "Mar 2026 - Mei 2026",
     points: [
+      "Aplikasi Tugas Akhir ini saya kembangkan bersama pihak Puskesmas untuk membantu tenaga medis mendeteksi dini kondisi stunting pada anak.",
       "Mengembangkan sistem rekam medis digital dan mesin inferensi berbasis aturan (Rule-Based) untuk deteksi dini stunting sesuai standar antropometri WHO.",
       "Membangun Dasbor Orang Tua interaktif berbasis React Recharts untuk memantau grafik tumbuh kembang anak secara visual.",
       "Membuat modul otomatis generator rekomendasi gizi berbasis indikator hasil deteksi kondisi fisik anak.",
@@ -295,6 +471,7 @@ export const timelineData: TimelineItem[] = [
       "Swadaya Air Desa Soka Lerep - Ungaran Barat, Kabupaten Semarang, Jawa Tengah",
     period: "Mei 2026 - Jun 2026",
     points: [
+      "Saya merancang aplikasi ini untuk mempermudah petugas dan warga Desa Soka Lerep dalam pencatatan meteran air hingga pembayaran tagihan bulanan.",
       "Merancang aplikasi Smart-Utility untuk otomatisasi konversi angka meteran air fisik warga menjadi nilai tagihan pembayaran secara akurat.",
       "Membangun panel kontrol manajemen data pelanggan serta laporan komparatif riwayat pembayaran bulanan.",
       "Mengintegrasikan Payment Gateway untuk memfasilitasi transaksi pembayaran tagihan air bulanan secara instan dan aman.",
@@ -308,6 +485,7 @@ export const timelineData: TimelineItem[] = [
     institution: "Universitas Dian Nuswantoro",
     period: "Agu 2022 - Sep 2026",
     points: [
+      "Selama kuliah S1 Teknik Informatika di UDINUS, saya fokus mendalami rekayasa perangkat lunak, pemrograman web, dan manajemen basis data.",
       "Menjalani kuliah S1 Teknik Informatika dengan capaian IPK 3,80 dari skala 4.00 (predikat Cumlaude).",
       "Mempelajari materi utama berupa rekayasa perangkat lunak, pemograman web, basis data, dan struktur data.",
       "Mengikuti pelatihan dan kursus mandiri di luar jam kuliah untuk menambah keterampilan pembuatan aplikasi.",
@@ -321,6 +499,7 @@ export const timelineData: TimelineItem[] = [
     institution: "SMAN 2 Ungaran",
     period: "Jul 2018 - Mei 2021",
     points: [
+      "Pendidikan MIPA di SMAN 2 Ungaran menjadi tempat saya melatih logika matematika, analitis, dan problem solving dasar.",
       "Menyelesaikan pendidikan jurusan MIPA dengan nilai rata-rata Ujian Sekolah 85,00 dari skala 100.",
       "Memperoleh nilai tertinggi pada mata pelajaran Sejarah Indonesia (89), Matematika (88), dan Kimia (88).",
       "Mempertahankan nilai yang stabil pada seluruh mata pelajaran kelompok IPA dan mata pelajaran umum.",
