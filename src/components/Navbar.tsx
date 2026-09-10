@@ -31,7 +31,7 @@ function PingStatus() {
 
   return (
     <span
-      className={`tabular-nums transition-colors duration-300 ${
+      className={`tabular-nums transition-colors duration-300 font-bold ${
         isHigh ? "text-blueprint-amber" : "text-blueprint-teal"
       }`}
     >
@@ -48,12 +48,12 @@ export function Navbar({ activeSection: activeSectionProp }: NavbarProps) {
   );
 
   const navLinks = [
-    { label: "HQ", href: "#home" },
-    { label: "PROFILE", href: "#about" },
-    { label: "LOADOUT", href: "#skills" },
-    { label: "QUESTS", href: "#projects" },
-    { label: "LOGS", href: "#experience" },
-    { label: "CO-OP", href: "#contact" },
+    { label: "BERANDA", href: "#home" },
+    { label: "TENTANG SAYA", href: "#about" },
+    { label: "KEAHLIAN", href: "#skills" },
+    { label: "PROYEK", href: "#projects" },
+    { label: "PENGALAMAN", href: "#experience" },
+    { label: "KONTAK", href: "#contact" },
   ];
 
   useEffect(() => {
@@ -123,83 +123,81 @@ export function Navbar({ activeSection: activeSectionProp }: NavbarProps) {
       <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blueprint-teal/50 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between relative">
-        {/* Left Side: Game Logo + Level & Rank Badge */}
-        <div className="flex items-center gap-3">
-          {/* Logo Name Tag */}
+        {/* Left Side: Game Logo + Status Bar (LVL, Bar, RANK & PING) */}
+        <div className="flex items-center shrink-0">
           <a
             href="#home"
             onClick={(e) => handleLinkClick(e, "#home")}
-            className={`flex items-center gap-3 group cursor-pointer skew-x-[-10deg] px-4 py-2 transition-all duration-300 border-l-4 border-blueprint-teal ${
-              scrolled
-                ? "bg-blueprint-bgSec/60 hover:bg-blueprint-teal/10 border-r border-y border-blueprint-teal/20"
-                : "bg-transparent hover:bg-blueprint-teal/10 border-r-0 border-y-0"
-            }`}
+            className="flex items-center gap-3 group cursor-pointer skew-x-[-10deg] py-1.5 transition-all duration-300 border-l-4 border-blueprint-teal bg-transparent hover:bg-blueprint-teal/10 pl-3.5 pr-2"
           >
-            <Gamepad2 className="w-6 h-6 text-blueprint-teal drop-shadow-[0_0_8px_#5EEAD4] group-hover:scale-110 transition-transform" />
-            <span className="font-display font-black text-xl italic text-blueprint-text group-hover:text-blueprint-teal transition-colors tracking-wide">
-              MUHAMMAD<span className="text-blueprint-teal/50">_</span>RIZAL
-            </span>
-          </a>
+            <Gamepad2 className="w-6 h-6 text-blueprint-teal drop-shadow-[0_0_8px_#5EEAD4] group-hover:scale-110 transition-transform shrink-0" />
 
-          {/* Level & Rank Badge (Desain disamakan dengan Logo Name Tag) */}
-          <div
-            className={`hidden md:flex items-center gap-2.5 font-mono text-xs tracking-widest skew-x-[-10deg] px-4 py-2 border-l-4 border-blueprint-teal transition-all duration-300 ${
-              scrolled
-                ? "bg-blueprint-bgSec/60 border-r border-y border-blueprint-teal/20"
-                : "bg-transparent border-r-0 border-y-0"
-            }`}
-          >
-            <span className="skew-x-[10deg] flex items-center gap-2">
-              <span className="text-blueprint-textSec">LVL</span>
-              <span className="font-display font-black text-sm text-blueprint-teal">
-                99
+            <div className="flex flex-col gap-0.5">
+              {/* Teks Nama Utama */}
+              <span className="font-display font-black text-lg md:text-xl italic text-blueprint-text group-hover:text-blueprint-teal transition-colors tracking-wide leading-none">
+                MUHAMMAD<span className="text-blueprint-teal/50">_</span>RIZAL
               </span>
-              <span className="text-blueprint-teal/30">|</span>
-              <span className="text-blueprint-textSec">RANK</span>
-              <span className="font-display font-black text-sm text-blueprint-amber">
-                S+
-              </span>
-            </span>
-          </div>
+
+              {/* Status Bar */}
+              <div className="flex items-center gap-2 font-mono text-[9px] sm:text-[10px] tracking-wider leading-none mt-1">
+                <div className="flex items-center gap-1">
+                  <span className="text-blueprint-textSec">LVL</span>
+                  <span className="font-display font-black text-blueprint-teal">
+                    99
+                  </span>
+                </div>
+
+                {/* Progress Bar Level */}
+                <div className="w-10 sm:w-14 h-1.5 bg-blueprint-bg/80 border border-blueprint-teal/30 p-[1px] relative overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-blueprint-teal via-blueprint-teal to-blueprint-amber w-[85%] shadow-[0_0_6px_rgba(94,234,212,0.8)]" />
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <span className="text-blueprint-textSec">RANK</span>
+                  <span className="font-display font-black text-blueprint-amber">
+                    S+
+                  </span>
+                </div>
+
+                <span className="text-blueprint-teal/30">|</span>
+
+                {/* Indikator Ping */}
+                <div className="flex items-center gap-1 font-bold">
+                  <Wifi className="w-3 h-3 text-blueprint-teal" />
+                  <span className="text-blueprint-textSec">PING:</span>
+                  <PingStatus />
+                </div>
+              </div>
+            </div>
+          </a>
         </div>
 
-        {/* Desktop Menu - HUD Style */}
-        <div className="hidden lg:flex items-center gap-4">
-          <div className="flex items-center bg-blueprint-bgSec/60 p-1.5 rounded-lg border border-blueprint-teal/20 backdrop-blur-sm skew-x-[-10deg]">
-            {navLinks.map((link) => {
-              const linkId = link.href.substring(1);
-              const isActive = currentActive === linkId;
+        {/* Right Side: Desktop Menu (Mepet Kanan & Tanpa Background) */}
+        <div className="hidden lg:flex items-center gap-1 ml-auto">
+          {navLinks.map((link) => {
+            const linkId = link.href.substring(1);
+            const isActive = currentActive === linkId;
 
-              return (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={(e) => handleLinkClick(e, link.href)}
-                  className={`font-display font-bold text-xs uppercase tracking-widest transition-all duration-300 px-4 py-2 relative block overflow-hidden ${
-                    isActive
-                      ? "text-blueprint-bg bg-blueprint-teal shadow-[0_0_15px_rgba(94,234,212,0.4)] hover:bg-white hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.65)]"
-                      : "text-blueprint-textSec hover:text-blueprint-teal hover:bg-blueprint-teal/10"
-                  }`}
-                >
-                  <span className="skew-x-[10deg] block relative z-10">
-                    {link.label}
-                  </span>
-                  {isActive && (
-                    <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] animate-[shimmer_2s_infinite]" />
-                  )}
-                </a>
-              );
-            })}
-          </div>
-
-          {/* Status Indicator (Ping/Server) */}
-          <div className="font-mono font-bold text-[10px] tracking-widest border border-blueprint-teal/40 px-3 py-1.5 bg-blueprint-bgSec/80 flex items-center gap-2 shadow-[0_0_10px_rgba(94,234,212,0.1)] skew-x-[-10deg]">
-            <span className="skew-x-[10deg] flex items-center gap-2">
-              <Wifi className="w-3 h-3 text-blueprint-teal" />
-              <span className="text-blueprint-text">PING:</span>
-              <PingStatus />
-            </span>
-          </div>
+            return (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) => handleLinkClick(e, link.href)}
+                className={`font-display font-bold text-xs uppercase tracking-widest transition-all duration-300 px-3.5 py-2 relative block skew-x-[-10deg] ${
+                  isActive
+                    ? "text-blueprint-bg bg-blueprint-teal shadow-[0_0_15px_rgba(94,234,212,0.4)] hover:bg-white hover:shadow-[0_0_25px_rgba(255,255,255,0.65)]"
+                    : "text-blueprint-textSec hover:text-blueprint-teal hover:bg-blueprint-teal/10"
+                }`}
+              >
+                <span className="skew-x-[10deg] block relative z-10">
+                  {link.label}
+                </span>
+                {isActive && (
+                  <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] animate-[shimmer_2s_infinite]" />
+                )}
+              </a>
+            );
+          })}
         </div>
 
         {/* Mobile Toggle Button */}
@@ -237,6 +235,8 @@ export function Navbar({ activeSection: activeSectionProp }: NavbarProps) {
                 RANK{" "}
                 <strong className="text-blueprint-amber font-black">S+</strong>
               </span>
+              <span className="text-blueprint-teal/30">|</span>
+              <PingStatus />
             </div>
           </div>
           <ul className="flex flex-col gap-3 font-display font-bold">

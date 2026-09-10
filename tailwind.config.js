@@ -18,9 +18,12 @@ export default {
         }
       },
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
-        display: ["'Space Grotesk'", "sans-serif"],
-        mono: ["'JetBrains Mono'", "monospace"],
+        // Font teks standar diganti ke font ala sci-fi/terminal game
+        sans: ["'Rajdhani'", "'Inter'", "sans-serif"],
+        // Font judul/header bergaya HUD cyberpunk & arcade
+        display: ["'Chakra Petch'", "'Orbitron'", "sans-serif"],
+        // Font terminal/code HUD bertema gaming
+        mono: ["'Share Tech Mono'", "'JetBrains Mono'", "monospace"],
       },
       backgroundImage: {
         'blueprint-grid': 'linear-gradient(to right, rgba(94, 234, 212, 0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(94, 234, 212, 0.04) 1px, transparent 1px)',

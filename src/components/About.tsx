@@ -18,6 +18,9 @@ import {
   Target,
   Mail,
   MapPin,
+  Server,
+  Smartphone,
+  Wrench,
 } from "lucide-react";
 import {
   profileData,
@@ -76,6 +79,7 @@ type AboutSlide = {
   icon: React.ReactNode;
   accent: "teal" | "amber" | "violet";
   headline: string;
+  description: string;
   image?: string;
   bio?: string;
   callouts?: string[];
@@ -88,7 +92,7 @@ type AboutSlide = {
 };
 
 /* ============================================================
-   Helper Builders (Mengonversi Data dari portfolioData.ts)
+   Helper Builders
    ============================================================ */
 function renderHighlightIcon(key: string) {
   switch (key) {
@@ -109,12 +113,14 @@ function renderCategoryIcon(key: string) {
   switch (key) {
     case "code":
       return <Code2 className="w-4 h-4" />;
-    case "cpu":
-      return <Cpu className="w-4 h-4" />;
-    case "cloud":
-      return <Cloud className="w-4 h-4" />;
+    case "server":
+      return <Server className="w-4 h-4" />;
+    case "smartphone":
+      return <Smartphone className="w-4 h-4" />;
     case "database":
       return <Database className="w-4 h-4" />;
+    case "wrench":
+      return <Wrench className="w-4 h-4" />;
     default:
       return <Code2 className="w-4 h-4" />;
   }
@@ -142,7 +148,6 @@ function buildArsenalFromData(data: ArsenalGroupData[]): ArsenalGroup[] {
    Penyusunan Data Slide Dinamis
    ============================================================ */
 const AboutData: AboutSlide[] = [
-  /* ================= 01 · OVERVIEW ================= */
   {
     id: "01",
     key: "overview",
@@ -150,6 +155,8 @@ const AboutData: AboutSlide[] = [
     icon: <Target className="w-3.5 h-3.5" />,
     accent: "teal",
     headline: "Profil Ringkas",
+    description:
+      "Halaman profil personal yang memuat ringkasan latar belakang profesional, filosofi kerja, dan gambaran umum keahlian saya sebagai pengembang web.",
     image: profileData.avatar,
     bio: profileData.bio,
     callouts: aboutOverviewData.callouts,
@@ -159,8 +166,6 @@ const AboutData: AboutSlide[] = [
       value: h.value,
     })),
   },
-
-  /* ================= 02 · SKILL_TREE ================= */
   {
     id: "02",
     key: "skill_tree",
@@ -168,11 +173,11 @@ const AboutData: AboutSlide[] = [
     icon: <Crosshair className="w-3.5 h-3.5" />,
     accent: "amber",
     headline: "Penguasaan Teknologi",
+    description:
+      "Eksplorasi ekosistem alat pengembang dan teknologi yang biasa saya pergunakan dalam membangun aplikasi modern dari sisi frontend maupun backend.",
     image: "",
     arsenal: buildArsenalFromData(arsenalData),
   },
-
-  /* ================= 03 · FIELD_OPS ================= */
   {
     id: "03",
     key: "field_ops",
@@ -180,6 +185,8 @@ const AboutData: AboutSlide[] = [
     icon: <Briefcase className="w-3.5 h-3.5" />,
     accent: "teal",
     headline: "Riwayat Proyek & Peran",
+    description:
+      "Rekapitulasi pengalaman teknis, peran profesional, dan proyek-proyek penting yang telah saya kerjakan secara nyata.",
     missions: timelineData
       .filter((t) => t.type === "pengalaman")
       .map((t) => ({
@@ -190,8 +197,6 @@ const AboutData: AboutSlide[] = [
         tags: t.points.slice(1),
       })),
   },
-
-  /* ================= 04 · ACADEMY ================= */
   {
     id: "04",
     key: "academy",
@@ -199,6 +204,8 @@ const AboutData: AboutSlide[] = [
     icon: <GraduationCap className="w-3.5 h-3.5" />,
     accent: "violet",
     headline: "Latar Belakang Akademis",
+    description:
+      "Ringkasan jejak pendidikan formal serta program pelatihan/sertifikasi teknis yang menjadi fondasi kompetensi saya.",
     education: timelineData
       .filter((t) => t.type === "pendidikan")
       .map((t) => ({
@@ -210,8 +217,6 @@ const AboutData: AboutSlide[] = [
         tag: t.points.slice(1),
       })),
   },
-
-  /* ================= 05 · CONTACT_HQ ================= */
   {
     id: "05",
     key: "contact",
@@ -219,6 +224,8 @@ const AboutData: AboutSlide[] = [
     icon: <UserPlus className="w-3.5 h-3.5" />,
     accent: "amber",
     headline: "Hubungi Saya",
+    description:
+      "Daftar saluran komunikasi resmi untuk berdiskusi, berkolaborasi, atau mengajukan tawaran proyek bersama saya.",
     channels: [
       {
         icon: <Mail className="w-4 h-4" />,
@@ -260,7 +267,7 @@ const ACCENT = {
     glow: "shadow-[0_0_22px_rgba(94,234,212,0.30)]",
     bgSoft: "bg-blueprint-teal/10",
     bar: "bg-blueprint-teal",
-    chip: "bg-blueprint-teal/10 border-blueprint-teal/30 text-blueprint-teal",
+    chip: "bg-blueprint-teal/20 border-blueprint-teal/50 text-blueprint-teal font-semibold font-mono",
     dot: "bg-blueprint-teal",
     hoverBd: "hover:border-blueprint-teal/70",
   },
@@ -270,7 +277,7 @@ const ACCENT = {
     glow: "shadow-[0_0_22px_rgba(245,183,84,0.28)]",
     bgSoft: "bg-blueprint-amber/10",
     bar: "bg-blueprint-amber",
-    chip: "bg-blueprint-amber/10 border-blueprint-amber/30 text-blueprint-amber",
+    chip: "bg-blueprint-amber/20 border-blueprint-amber/50 text-blueprint-amber font-semibold font-mono",
     dot: "bg-blueprint-amber",
     hoverBd: "hover:border-blueprint-amber/70",
   },
@@ -280,7 +287,7 @@ const ACCENT = {
     glow: "shadow-[0_0_22px_rgba(167,139,250,0.28)]",
     bgSoft: "bg-[#A78BFA]/10",
     bar: "bg-[#A78BFA]",
-    chip: "bg-[#A78BFA]/10 border-[#A78BFA]/30 text-[#A78BFA]",
+    chip: "bg-[#A78BFA]/20 border-[#A78BFA]/50 text-[#A78BFA] font-semibold font-mono",
     dot: "bg-[#A78BFA]",
     hoverBd: "hover:border-[#A78BFA]/70",
   },
@@ -288,7 +295,6 @@ const ACCENT = {
 
 type AccentKey = (typeof AboutData)[number]["accent"];
 
-/* Brand Icons */
 function GithubIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -324,9 +330,6 @@ function LinkedinIcon({ className }: { className?: string }) {
   );
 }
 
-/* ============================================================
-   Reusable HUD Building Blocks
-   ============================================================ */
 function HudOverlay() {
   return (
     <>
@@ -426,13 +429,13 @@ interface BlockHeaderProps {
 function BlockHeader({ accent, title }: BlockHeaderProps) {
   const c = ACCENT[accent];
   return (
-    <div className="flex items-center gap-2.5 mb-4">
+    <div className="flex items-center gap-2.5 mb-4 font-mono">
       <span className={`w-1 h-4 ${c.bar} shadow-[0_0_8px_currentColor]`} />
-      <h4 className="font-mono font-bold text-[11px] sm:text-xs tracking-[0.2em] uppercase text-blueprint-text">
+      <h4 className="font-bold text-[11px] sm:text-xs tracking-[0.2em] uppercase text-blueprint-text">
         {title}
       </h4>
       <div className="flex-1 h-px bg-gradient-to-r from-blueprint-teal/25 to-transparent" />
-      <span className={`font-mono text-[9px] ${c.text}`}>▮▮▮</span>
+      <span className={`text-[9px] ${c.text}`}>▮▮▮</span>
     </div>
   );
 }
@@ -446,7 +449,7 @@ function Panel({
 }) {
   return (
     <div
-      className={`bg-blueprint-bgSec/40 backdrop-blur-md border border-blueprint-teal/10 p-4 sm:p-5 ${className}`}
+      className={`bg-blueprint-bgSec/60 backdrop-blur-md border border-blueprint-teal/20 p-4 sm:p-5 ${className}`}
     >
       {children}
     </div>
@@ -505,11 +508,12 @@ export function About() {
     prevIndex.current = activeIndex;
     return dir;
   };
+  const steps = (n: number) => (t: number) => Math.floor(t * n) / n;
 
   return (
     <section
       id="about"
-      className="relative min-h-screen flex flex-col justify-between overflow-hidden section-scroll border-t border-blueprint-teal/20 bg-blueprint-bg"
+      className="relative min-h-screen h-auto flex flex-col justify-between border-t border-blueprint-teal/20 bg-blueprint-bg font-mono"
     >
       <AmbientBackground
         glowIntensity={0.18}
@@ -518,27 +522,92 @@ export function About() {
       />
       <div className="absolute inset-0 bg-blueprint-grid bg-grid-size opacity-20 pointer-events-none mix-blend-screen" />
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 flex-1 flex flex-col justify-between pt-20 pb-8">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 flex-1 flex flex-col justify-between pt-20 pb-12">
         {/* ================= SECTION HEADER ================= */}
-        <div className="mb-4 md:mb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-2 shrink-0">
-          <div>
-            <div className="flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase text-blueprint-teal mb-1.5">
-              <span className="bg-blueprint-teal/10 border border-blueprint-teal/30 px-2 py-0.5">
-                Ringkasan Portofolio
+        {/* ================= SECTION HEADER ================= */}
+        <div className="mb-6 flex flex-col items-start gap-3 shrink-0">
+          {/* 1. Tag Ringkasan Portofolio (Selalu di paling atas) */}
+          <div className="font-bold text-xs tracking-widest text-blueprint-teal px-3 py-1 bg-blueprint-teal/10 border-l-4 border-blueprint-teal inline-flex items-center gap-2">
+            <Target className="w-3.5 h-3.5 text-blueprint-amber animate-spin-slow" />
+            RINGKASAN_PORTOFOLIO // OVERVIEW
+          </div>
+
+          {/* 2. Judul Utama (PROFILE TENTANG SAYA) */}
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between w-full gap-4">
+            <div className="relative inline-block group cursor-default select-none">
+              {/* LAYER GLITCH 1: CYAN / TEAL */}
+              <motion.h2
+                aria-hidden="true"
+                animate={{
+                  x: [-2, 4, -3, 2, 0],
+                  y: [0, -1, 1, 0],
+                  opacity: [0.8, 0.2, 0.9, 0.3, 0.8],
+                  skewX: [-5, -8, -3, -6, -5],
+                }}
+                transition={{
+                  duration: 0.6,
+                  repeat: Infinity,
+                  repeatType: "mirror",
+                  ease: steps(3),
+                }}
+                className="absolute inset-0 text-4xl md:text-5xl lg:text-6xl font-black font-display text-cyan-400 tracking-tighter pointer-events-none uppercase italic z-0 mix-blend-screen"
+                style={{
+                  clipPath: "polygon(0 0, 100% 0, 100% 45%, 0 45%)",
+                  filter: "drop-shadow(-2px 0px 2px rgba(6,182,212,0.8))",
+                }}
+              >
+                PROFILE <span>{active.label.toUpperCase()}</span>
+              </motion.h2>
+
+              {/* LAYER GLITCH 2: ROSE / MAGENTA */}
+              <motion.h2
+                aria-hidden="true"
+                animate={{
+                  x: [3, -3, 4, -2, 0],
+                  y: [0, 1, -1, 0],
+                  opacity: [0.9, 0.3, 0.8, 0.2, 0.9],
+                  skewX: [-5, -2, -7, -4, -5],
+                }}
+                transition={{
+                  duration: 0.45,
+                  repeat: Infinity,
+                  repeatType: "mirror",
+                  ease: steps(2),
+                  delay: 0.05,
+                }}
+                className="absolute inset-0 text-4xl md:text-5xl lg:text-6xl font-black font-display text-rose-500 tracking-tighter pointer-events-none uppercase italic z-0 mix-blend-screen"
+                style={{
+                  clipPath: "polygon(0 50%, 100% 50%, 100% 100%, 0 100%)",
+                  filter: "drop-shadow(2px 0px 2px rgba(244,63,94,0.8))",
+                }}
+              >
+                PROFILE <span>{active.label.toUpperCase()}</span>
+              </motion.h2>
+
+              {/* TEKS UTAMA */}
+              <h2 className="relative text-4xl md:text-5xl lg:text-6xl font-black font-display text-blueprint-text tracking-tighter drop-shadow-[0_0_20px_rgba(94,234,212,0.4)] hover:text-blueprint-teal transition-colors duration-300 uppercase italic skew-x-[-5deg] z-10">
+                PROFILE{" "}
+                <span className={accent.text}>
+                  {active.label.toUpperCase()}
+                </span>
+              </h2>
+            </div>
+
+            {/* Counter Display (Misal: 01/05) */}
+            <div className="flex items-center gap-2 text-[10px] text-slate-300 self-start md:self-end">
+              <span>SLIDE</span>
+              <span
+                className={`px-2 py-0.5 border ${accent.border} ${accent.text} font-bold`}
+              >
+                {active.id}/{String(total).padStart(2, "0")}
               </span>
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-blueprint-text tracking-tight uppercase italic">
-              Profile <span className={accent.text}>{active.label}</span>
-            </h2>
           </div>
-          <div className="flex items-center gap-2 font-mono text-[10px] text-blueprint-textSec">
-            <span>SLIDE</span>
-            <span
-              className={`px-2 py-0.5 border ${accent.border} ${accent.text} font-bold`}
-            >
-              {active.id}/{String(total).padStart(2, "0")}
-            </span>
-          </div>
+
+          {/* 3. Teks Keterangan / Deskripsi */}
+          <p className="text-xs sm:text-sm text-slate-300 w-full text-justify leading-relaxed border-l-2 border-blueprint-teal/40 pl-3">
+            {active.description}
+          </p>
         </div>
 
         {/* ================= STAGE (AnimatePresence) ================= */}
@@ -552,16 +621,13 @@ export function About() {
             className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start my-auto w-full"
           >
             {/* ---------- LEFT: Character / Visual Panel ---------- */}
-            <div className="lg:col-span-5 flex flex-col gap-4">
+            <div className="lg:col-span-5 flex flex-col justify-start gap-4">
               <div
-                className={`relative flex-1 min-h-[280px] max-h-[380px] sm:max-h-[420px] lg:max-h-[460px] aspect-[4/5] sm:aspect-[5/6] bg-blueprint-bgSec/40 backdrop-blur-md border ${accent.border} ${accent.glow} overflow-hidden flex items-center justify-center transition-shadow duration-500`}
+                className={`relative h-[380px] sm:h-[440px] lg:h-[480px] bg-blueprint-bgSec/40 backdrop-blur-md border ${accent.border} ${accent.glow} overflow-hidden flex items-center justify-center transition-shadow duration-500`}
               >
-                {/* Overlay Scanline & Efek HUD */}
                 <HudOverlay />
 
-                {/* LOGIKA KONTEN PANEL VISUAL */}
                 {active.key === "overview" ? (
-                  /* KONTEN LANYARD 3D KHUSUS SLIDE TENTANG SAYA */
                   <div className="relative z-10 w-full h-full flex items-center justify-center pointer-events-auto">
                     <Lanyard
                       position={[0, 0, 16]}
@@ -573,7 +639,6 @@ export function About() {
                     />
                   </div>
                 ) : active.image ? (
-                  /* GAMBAR BIASA UNTUK OPERATOR LAIN JIKA TERSEDIA PROPERTI IMAGE */
                   <div className="relative z-10 flex items-center justify-center w-full h-full p-4">
                     <img
                       src={active.image}
@@ -582,21 +647,19 @@ export function About() {
                     />
                   </div>
                 ) : (
-                  /* SILUET ANIMASI HUD SEBAGAI FALLBACK JIKA TIDAK ADA GAMBAR */
                   <Silhouette accent={active.accent} reduced={reducedMotion} />
                 )}
 
-                {/* Metadata HUD Label */}
-                <div className="absolute bottom-3 left-3 z-20 font-mono text-[9px] text-blueprint-teal/80 bg-blueprint-bg/70 backdrop-blur-sm border border-blueprint-teal/20 px-2 py-1 pointer-events-none">
+                <div className="absolute bottom-3 left-3 z-20 text-[9px] text-blueprint-teal/80 bg-blueprint-bg/70 backdrop-blur-sm border border-blueprint-teal/20 px-2 py-1 pointer-events-none">
                   SLIDE: {active.id}-{active.label.toUpperCase()}
                 </div>
-                <div className="absolute top-3 right-3 z-20 font-mono text-[9px] text-blueprint-textSec pointer-events-none">
+                <div className="absolute top-3 right-3 z-20 text-[9px] text-slate-300 pointer-events-none">
                   {active.headline}
                 </div>
               </div>
 
-              {/* Control Navigasi Slide Arrow */}
-              <div className="flex items-center justify-between gap-3">
+              {/* Navigasi panah slide */}
+              <div className="flex items-center justify-between gap-3 shrink-0">
                 <NavArrow
                   dir="prev"
                   disabled={!canPrev}
@@ -630,30 +693,32 @@ export function About() {
               variants={listVariants}
               initial="hidden"
               animate="show"
-              className="lg:col-span-7 flex flex-col max-h-[440px] sm:max-h-[480px] lg:max-h-[500px] overflow-y-auto pr-1.5 hide-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+              /*
+                Batas tinggi disamakan presisi dengan panel visual kiri (480px di desktop)
+                serta ditambahkan kelas overflow-y-auto hide-scrollbar agar bisa di-scroll rapi tanpa scrollbar bawaan
+              */
+              className="lg:col-span-7 flex flex-col justify-start h-auto lg:h-[532px] max-h-[532px] overflow-y-auto hide-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden w-full pr-1"
             >
               {/* Slide 01 · OVERVIEW */}
               {active.bio && (
-                <>
-                  <Panel className="mb-4">
+                <div className="flex flex-col justify-start gap-4">
+                  <Panel className="shrink-0">
                     <BlockHeader
                       accent={active.accent}
-                      title="Professional_Summary"
+                      title="Ringkasan Profile"
                     />
-                    <p className="text-xs sm:text-sm text-blueprint-textSec leading-relaxed text-justify">
+                    <p className="text-justify text-xs sm:text-sm text-slate-200 leading-relaxed">
                       {active.bio}
                     </p>
                   </Panel>
                   {active.callouts && (
-                    <div className="flex flex-col gap-2 mb-4">
+                    <div className="flex flex-col gap-2 shrink-0">
                       {active.callouts.map((c, i) => (
                         <motion.div
                           key={i}
                           variants={itemVariants}
-                          className={`flex items-start gap-2 text-[12px] sm:text-[13px] font-mono ${
-                            i === 0
-                              ? "text-blueprint-teal"
-                              : "text-blueprint-textSec"
+                          className={`flex items-start gap-2 text-xs sm:text-sm ${
+                            i === 0 ? "text-blueprint-teal" : "text-slate-300"
                           } border-l-2 border-blueprint-teal/30 pl-3`}
                         >
                           <span className="mt-px">▸</span>
@@ -663,15 +728,17 @@ export function About() {
                     </div>
                   )}
                   {active.highlights && (
-                    <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 shrink-0">
                       {active.highlights.map((h, i) => (
                         <motion.div
                           key={i}
                           variants={itemVariants}
                           className={`bg-blueprint-bgSec/50 backdrop-blur-sm border ${accent.border} ${accent.hoverBd} p-3 sm:p-4 transition-colors`}
                         >
-                          <div className={`${accent.text} mb-1.5`}>{h.icon}</div>
-                          <div className="font-mono text-[9px] text-blueprint-textSec uppercase tracking-widest mb-1">
+                          <div className={`${accent.text} mb-1.5`}>
+                            {h.icon}
+                          </div>
+                          <div className="text-[9px] text-slate-300 uppercase tracking-widest mb-1">
                             {h.label}
                           </div>
                           <div className="font-display font-bold text-blueprint-text text-xs sm:text-sm">
@@ -681,27 +748,27 @@ export function About() {
                       ))}
                     </div>
                   )}
-                </>
+                </div>
               )}
 
               {/* Slide 02 · SKILL_TREE */}
               {active.arsenal && (
-                <div className="flex flex-col gap-3.5">
-                  <Panel>
-                    <p className="text-xs sm:text-sm text-blueprint-textSec leading-relaxed text-justify">
+                <div className="flex flex-col justify-start gap-3.5">
+                  <Panel className="shrink-0">
+                    <p className="text-justify text-xs sm:text-sm text-slate-200 leading-relaxed">
                       Daftar teknologi dan alat pengembang yang biasa saya
                       gunakan dalam membangun aplikasi web modern, baik dari
                       sisi antarmuka maupun logika server.
                     </p>
                   </Panel>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {active.arsenal.map((g) => (
                       <motion.div key={g.category} variants={itemVariants}>
-                        <Panel className="h-full">
+                        <Panel className="h-full flex flex-col justify-start">
                           <div className="flex items-center gap-2 mb-3 border-b border-blueprint-teal/15 pb-2">
                             <span className={accent.text}>{g.icon}</span>
-                            <h4 className="font-display font-bold text-xs uppercase tracking-widest text-blueprint-text">
+                            <h4 className="font-display font-bold text-[11px] sm:text-xs uppercase tracking-widest text-blueprint-text truncate">
                               {g.category.replace("_", " ")}
                             </h4>
                           </div>
@@ -710,21 +777,21 @@ export function About() {
                             {g.items.map((it) => (
                               <div
                                 key={it.name}
-                                className="group flex items-center justify-between gap-2.5 p-2 rounded bg-blueprint-bg/50 border border-blueprint-teal/10 hover:border-blueprint-teal/40 transition-all"
+                                className="group flex items-center justify-between gap-2 p-1.5 rounded bg-blueprint-bg/50 border border-blueprint-teal/10 hover:border-blueprint-teal/40 transition-all"
                               >
-                                <div className="flex items-center gap-2 min-w-0">
+                                <div className="flex items-center gap-1.5 min-w-0">
                                   <img
                                     src={it.icon}
                                     alt={it.name}
-                                    className="w-4 h-4 object-contain shrink-0 filter drop-shadow-sm group-hover:scale-110 transition-transform"
+                                    className="w-3.5 h-3.5 object-contain shrink-0 filter drop-shadow-sm group-hover:scale-110 transition-transform"
                                     loading="lazy"
                                   />
-                                  <span className="font-mono text-[11px] sm:text-xs text-blueprint-text group-hover:text-blueprint-teal transition-colors truncate">
+                                  <span className="text-[10px] sm:text-[11px] text-blueprint-text group-hover:text-blueprint-teal transition-colors truncate">
                                     {it.name}
                                   </span>
                                 </div>
                                 <span
-                                  className={`font-mono text-[9px] sm:text-[10px] ${accent.text} shrink-0`}
+                                  className={`text-[8px] sm:text-[9px] ${accent.text} shrink-0`}
                                 >
                                   {it.tier}
                                 </span>
@@ -740,44 +807,43 @@ export function About() {
 
               {/* Slide 03 · FIELD_OPS */}
               {active.missions && (
-                <div className="relative flex flex-col gap-3.5 pl-6 border-l-2 border-blueprint-teal/20">
-                  {active.missions.slice(0, 3).map((m, i) => {
-                    const isThird = i === 2;
+                <div className="relative flex flex-col justify-start gap-3.5 pl-6 border-l-2 border-blueprint-teal/30">
+                  {active.missions.slice(0, 2).map((m, i) => {
+                    const isSecond = i === 1;
 
-                    // Render Kartu ke-3 (Setengah Terpotong + Blurred / Faded + Overlay Button)
-                    if (isThird) {
+                    if (isSecond) {
                       return (
                         <motion.div
                           key={i}
                           variants={itemVariants}
-                          className="relative group"
+                          className="relative group overflow-hidden shrink-0"
                         >
-                          <div className="relative max-h-[90px] overflow-hidden opacity-40 blur-[1px] select-none pointer-events-none">
+                          <div className="relative max-h-[250px] sm:max-h-[270px] overflow-hidden opacity-75 select-none pointer-events-none">
                             <span
                               className={`absolute -left-[27px] top-1.5 w-2.5 h-2.5 rounded-full ${accent.dot} shadow-[0_0_8px_currentColor]`}
                             />
                             <Panel>
-                              <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
-                                <h4 className="font-display font-bold text-blueprint-text text-xs sm:text-sm uppercase tracking-wide">
+                              <div className="flex items-start justify-between gap-3 mb-1.5">
+                                <h4 className="font-display font-bold text-white text-sm sm:text-base uppercase tracking-wide min-w-0 flex-1">
                                   {m.role}
                                 </h4>
                                 <span
-                                  className={`font-mono text-[10px] ${accent.chip} px-2 py-0.5`}
+                                  className={`text-xs ${accent.chip} px-2.5 py-0.5 shrink-0 whitespace-nowrap ml-auto`}
                                 >
                                   {m.period}
                                 </span>
                               </div>
-                              <div className="font-mono text-[10px] text-blueprint-teal/70 mb-1.5">
+                              <div className="text-xs text-blueprint-teal font-medium mb-2">
                                 {m.org}
                               </div>
-                              <p className="text-xs text-blueprint-textSec leading-relaxed mb-2 text-justify">
+                              <p className="text-justify text-xs sm:text-sm text-slate-200 leading-relaxed mb-3">
                                 {m.summary}
                               </p>
                               <div className="flex flex-wrap gap-1.5">
                                 {m.tags.map((t) => (
                                   <span
                                     key={t}
-                                    className="font-mono text-[9px] text-blueprint-textSec bg-blueprint-bg/60 border border-blueprint-teal/10 px-2 py-0.5"
+                                    className="text-xs text-slate-100 bg-blueprint-bg/80 border border-blueprint-teal/30 px-2.5 py-1 rounded-xs"
                                   >
                                     {t}
                                   </span>
@@ -786,8 +852,7 @@ export function About() {
                             </Panel>
                           </div>
 
-                          {/* Overlay Gradien Pudar & Tombol Scroll ke #experience */}
-                          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blueprint-bg/70 to-blueprint-bg flex items-end justify-center pt-6">
+                          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blueprint-bg/80 to-blueprint-bg flex items-end justify-center">
                             <button
                               onClick={() => {
                                 const el =
@@ -796,7 +861,7 @@ export function About() {
                                   el.scrollIntoView({ behavior: "smooth" });
                                 }
                               }}
-                              className="group w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-blueprint-bgSec/90 hover:bg-blueprint-teal/20 border border-blueprint-teal/50 hover:border-blueprint-teal text-blueprint-teal font-mono text-xs uppercase tracking-widest backdrop-blur-md transition-all duration-300 cursor-pointer shadow-[0_0_15px_rgba(94,234,212,0.2)] hover:shadow-[0_0_25px_rgba(94,234,212,0.4)]"
+                              className="group w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-blueprint-bgSec/95 hover:bg-blueprint-teal/20 border border-blueprint-teal/60 hover:border-blueprint-teal text-blueprint-teal text-xs uppercase tracking-widest backdrop-blur-md transition-all duration-300 cursor-pointer shadow-[0_0_20px_rgba(94,234,212,0.25)] hover:shadow-[0_0_30px_rgba(94,234,212,0.5)]"
                             >
                               <span>Lihat Semua Pengalaman</span>
                               <ChevronDown className="w-4 h-4 group-hover:translate-y-1 transition-transform duration-300" />
@@ -806,38 +871,37 @@ export function About() {
                       );
                     }
 
-                    // Render Kartu Normal (Kartu 1 & 2)
                     return (
                       <motion.div
                         key={i}
                         variants={itemVariants}
-                        className="relative"
+                        className="relative shrink-0"
                       >
                         <span
                           className={`absolute -left-[27px] top-1.5 w-2.5 h-2.5 rounded-full ${accent.dot} shadow-[0_0_8px_currentColor]`}
                         />
-                        <Panel className="hover:border-blueprint-teal/40 transition-colors">
-                          <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
-                            <h4 className="font-display font-bold text-blueprint-text text-xs sm:text-sm uppercase tracking-wide">
+                        <Panel className="hover:border-blueprint-teal/50 transition-colors">
+                          <div className="flex items-start justify-between gap-3 mb-1.5">
+                            <h4 className="font-display font-bold text-white text-sm sm:text-base uppercase tracking-wide min-w-0 flex-1">
                               {m.role}
                             </h4>
                             <span
-                              className={`font-mono text-[10px] ${accent.chip} px-2 py-0.5`}
+                              className={`text-xs ${accent.chip} px-2.5 py-0.5 shrink-0 whitespace-nowrap ml-auto`}
                             >
                               {m.period}
                             </span>
                           </div>
-                          <div className="font-mono text-[10px] text-blueprint-teal/70 mb-1.5">
+                          <div className="text-xs text-blueprint-teal font-medium mb-2">
                             {m.org}
                           </div>
-                          <p className="text-xs text-blueprint-textSec leading-relaxed mb-2 text-justify">
+                          <p className="text-justify text-xs sm:text-sm text-slate-200 leading-relaxed mb-3">
                             {m.summary}
                           </p>
                           <div className="flex flex-wrap gap-1.5">
                             {m.tags.map((t) => (
                               <span
                                 key={t}
-                                className="font-mono text-[9px] text-blueprint-textSec bg-blueprint-bg/60 border border-blueprint-teal/10 px-2 py-0.5"
+                                className="text-xs text-slate-100 bg-blueprint-bg/80 border border-blueprint-teal/30 px-2.5 py-1 rounded-xs"
                               >
                                 {t}
                               </span>
@@ -852,74 +916,119 @@ export function About() {
 
               {/* Slide 04 · ACADEMY */}
               {active.education && (
-                <div className="flex flex-col gap-3.5">
-                  {active.education.map((e, i) => (
-                    <motion.div key={i} variants={itemVariants}>
-                      <Panel className={`border-l-4 ${accent.border}`}>
-                        <div className="pl-2.5 sm:pl-4">
-                          <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
-                            <h4 className="font-display font-bold text-blueprint-text text-xs sm:text-sm uppercase tracking-wide">
-                              {e.title}
-                            </h4>
-                            <span
-                              className={`font-mono text-[10px] ${accent.chip} px-2 py-0.5`}
+                <div className="flex flex-col justify-start gap-3.5">
+                  {active.education.slice(0, 2).map((e, i) => {
+                    const isSecond = i === 1;
+
+                    if (isSecond) {
+                      return (
+                        <motion.div
+                          key={i}
+                          variants={itemVariants}
+                          className="relative group overflow-hidden shrink-0"
+                        >
+                          <div className="relative max-h-[250px] sm:max-h-[270px] overflow-hidden opacity-75 select-none pointer-events-none">
+                            <Panel className={`border-l-4 ${accent.border}`}>
+                              <div className="pl-2.5 sm:pl-4">
+                                <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+                                  <h4 className="font-display font-bold text-white text-sm sm:text-base uppercase tracking-wide">
+                                    {e.title}
+                                  </h4>
+                                  <span
+                                    className={`text-xs ${accent.chip} px-2.5 py-0.5`}
+                                  >
+                                    {e.period}
+                                  </span>
+                                </div>
+                                <div className="text-xs text-blueprint-teal font-medium mb-2">
+                                  {e.org}
+                                </div>
+                                <p className="text-justify text-xs sm:text-sm text-slate-200 leading-relaxed mb-3">
+                                  {e.note}
+                                </p>
+                                {e.tag && e.tag.length > 0 && (
+                                  <div className="flex flex-wrap gap-1.5">
+                                    {e.tag.map((t) => (
+                                      <span
+                                        key={t}
+                                        className="text-xs text-slate-100 bg-blueprint-bg/80 border border-blueprint-teal/30 px-2.5 py-1 rounded-xs"
+                                      >
+                                        {t}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </Panel>
+                          </div>
+
+                          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blueprint-bg/80 to-blueprint-bg flex items-end justify-center">
+                            <button
+                              onClick={() => {
+                                const el =
+                                  document.getElementById("experience");
+                                if (el) {
+                                  el.scrollIntoView({ behavior: "smooth" });
+                                }
+                              }}
+                              className="group w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-blueprint-bgSec/95 hover:bg-[#A78BFA]/20 border border-[#A78BFA]/60 hover:border-[#A78BFA] text-[#A78BFA] text-xs uppercase tracking-widest backdrop-blur-md transition-all duration-300 cursor-pointer shadow-[0_0_20px_rgba(167,139,250,0.25)] hover:shadow-[0_0_30px_rgba(167,139,250,0.5)]"
                             >
-                              {e.period}
-                            </span>
+                              <span>Lihat Semua Pendidikan & Sertifikasi</span>
+                              <ChevronDown className="w-4 h-4 group-hover:translate-y-1 transition-transform duration-300" />
+                            </button>
                           </div>
-                          <div className="font-mono text-[10px] text-blueprint-teal/70 mb-1.5">
-                            {e.org}
-                          </div>
-                          <p className="text-xs text-blueprint-textSec leading-relaxed mb-2.5 text-justify">
-                            {e.note}
-                          </p>
-                          {e.tag && e.tag.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5">
-                              {e.tag.map((t) => (
-                                <span
-                                  key={t}
-                                  className="font-mono text-[9px] text-blueprint-textSec bg-blueprint-bg/60 border border-blueprint-teal/10 px-2 py-0.5"
-                                >
-                                  {t}
-                                </span>
-                              ))}
+                        </motion.div>
+                      );
+                    }
+
+                    return (
+                      <motion.div
+                        key={i}
+                        variants={itemVariants}
+                        className="shrink-0"
+                      >
+                        <Panel className={`border-l-4 ${accent.border}`}>
+                          <div className="pl-2.5 sm:pl-4">
+                            <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+                              <h4 className="font-display font-bold text-white text-sm sm:text-base uppercase tracking-wide">
+                                {e.title}
+                              </h4>
+                              <span
+                                className={`text-xs ${accent.chip} px-2.5 py-0.5`}
+                              >
+                                {e.period}
+                              </span>
                             </div>
-                          )}
-                        </div>
-                      </Panel>
-                    </motion.div>
-                  ))}
-                  <motion.div variants={itemVariants}>
-                    <div
-                      className={`border ${accent.border} p-3.5 flex items-start gap-3`}
-                    >
-                      <Award
-                        className={`w-5 h-5 ${accent.text} shrink-0 mt-0.5`}
-                      />
-                      <div>
-                        <div className="font-mono text-[10px] text-blueprint-text uppercase tracking-widest mb-1.5">
-                          Pelatihan & Sertifikasi Teknis
-                        </div>
-                        <div className="flex flex-wrap gap-1.5">
-                          {aboutOverviewData.certifications.map((c) => (
-                            <span
-                              key={c}
-                              className="font-mono text-[9px] text-blueprint-textSec bg-blueprint-bg/60 border border-blueprint-teal/10 px-2 py-0.5"
-                            >
-                              {c}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
+                            <div className="text-xs text-blueprint-teal font-medium mb-2">
+                              {e.org}
+                            </div>
+                            <p className="text-justify text-xs sm:text-sm text-slate-200 leading-relaxed mb-3">
+                              {e.note}
+                            </p>
+                            {e.tag && e.tag.length > 0 && (
+                              <div className="flex flex-wrap gap-1.5">
+                                {e.tag.map((t) => (
+                                  <span
+                                    key={t}
+                                    className="text-xs text-slate-100 bg-blueprint-bg/80 border border-blueprint-teal/30 px-2.5 py-1 rounded-xs"
+                                  >
+                                    {t}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </Panel>
+                      </motion.div>
+                    );
+                  })}
                 </div>
               )}
 
               {/* Slide 05 · CONTACT_HQ */}
               {active.channels && (
-                <div className="flex flex-col gap-3.5">
-                  <Panel>
+                <div className="flex flex-col justify-start gap-3.5">
+                  <Panel className="shrink-0">
                     <BlockHeader
                       accent={active.accent}
                       title="Saluran Komunikasi"
@@ -936,12 +1045,12 @@ export function About() {
                           className={`flex items-center gap-3 border px-3.5 py-2.5 transition-all cursor-pointer ${
                             ch.primary
                               ? `border-blueprint-teal ${accent.bgSoft} ${accent.text} ${accent.hoverBd}`
-                              : "border-blueprint-teal/15 text-blueprint-textSec hover:border-blueprint-teal/40 hover:text-blueprint-text"
+                              : "border-blueprint-teal/15 text-slate-300 hover:border-blueprint-teal/40 hover:text-white"
                           }`}
                         >
                           <span className="shrink-0">{ch.icon}</span>
                           <div className="min-w-0">
-                            <div className="font-mono text-[9px] uppercase tracking-widest opacity-70">
+                            <div className="text-[9px] uppercase tracking-widest opacity-70">
                               {ch.label}
                             </div>
                             <div className="font-display font-bold text-xs truncate">
@@ -956,7 +1065,7 @@ export function About() {
                   {active.deploy && (
                     <a
                       href={active.deploy.href}
-                      className="group relative flex items-center justify-center gap-2 bg-blueprint-teal text-blueprint-bg font-display font-black text-xs sm:text-sm px-5 py-3.5 skew-x-[-8deg] hover:bg-white transition-all shadow-[0_0_22px_rgba(94,234,212,0.45)] hover:shadow-[0_0_34px_rgba(94,234,212,0.8)] cursor-pointer"
+                      className="group relative flex items-center justify-center gap-2 bg-blueprint-teal text-blueprint-bg font-display font-black text-xs sm:text-sm px-5 py-3.5 skew-x-[-8deg] hover:bg-white transition-all shadow-[0_0_22px_rgba(94,234,212,0.45)] hover:shadow-[0_0_34px_rgba(94,234,212,0.8)] cursor-pointer shrink-0"
                     >
                       <span className="skew-x-[8deg] flex items-center gap-2">
                         <Rocket className="w-4 h-4 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
@@ -971,8 +1080,7 @@ export function About() {
         </AnimatePresence>
 
         {/* ================= SINGLE BOTTOM SELECTOR ================= */}
-        <div className="mt-4 md:mt-6 flex flex-col lg:flex-row items-stretch lg:items-center gap-3 border-t border-blueprint-teal/20 pt-4 shrink-0">
-          {/* Tab selector */}
+        <div className="mt-6 flex flex-col lg:flex-row items-stretch lg:items-center gap-3 border-t border-blueprint-teal/20 pt-4 shrink-0">
           <div className="flex flex-1 gap-2 overflow-x-auto pb-1 hide-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {AboutData.map((s, i) => {
               const isActive = i === activeIndex;
@@ -984,13 +1092,11 @@ export function About() {
                   className={`group relative flex items-center gap-1.5 shrink-0 px-3 sm:px-4 py-2 border transition-all duration-300 cursor-pointer ${
                     isActive
                       ? `${sc.border} ${sc.text} bg-blueprint-bgSec/70`
-                      : "border-blueprint-teal/15 text-blueprint-textSec bg-blueprint-bgSec/30 hover:border-blueprint-teal/40 hover:text-blueprint-text"
+                      : "border-blueprint-teal/15 text-slate-300 bg-blueprint-bgSec/30 hover:border-blueprint-teal/40 hover:text-white"
                   }`}
                 >
-                  <span className="font-mono text-[10px] opacity-70">
-                    {s.id}
-                  </span>
-                  <span className="hidden sm:inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest">
+                  <span className="text-[10px] opacity-70">{s.id}</span>
+                  <span className="hidden sm:inline-flex items-center gap-1.5 text-[9px] uppercase tracking-widest">
                     {s.icon}
                     {s.label}
                   </span>
@@ -1002,7 +1108,6 @@ export function About() {
             })}
           </div>
 
-          {/* Prev / Next arrows integrated */}
           <div className="flex gap-2 lg:ml-3">
             <NavArrow
               dir="prev"
@@ -1043,12 +1148,12 @@ function NavArrow({
       onClick={onClick}
       disabled={disabled}
       aria-label={dir === "prev" ? "Previous slide" : "Next slide"}
-      className={`group flex items-center gap-2 border font-mono text-xs uppercase tracking-widest transition-all cursor-pointer ${
+      className={`group flex items-center gap-2 border text-xs uppercase tracking-widest transition-all cursor-pointer ${
         compact ? "px-3 py-2" : "px-4 py-2"
       } ${
         disabled
-          ? "border-blueprint-teal/10 text-blueprint-textSec/40 cursor-not-allowed"
-          : "border-blueprint-teal/30 bg-blueprint-bgSec/50 text-blueprint-text hover:border-blueprint-teal hover:text-blueprint-teal hover:bg-blueprint-teal/10"
+          ? "border-blueprint-teal/10 text-slate-600 cursor-not-allowed"
+          : "border-blueprint-teal/30 bg-blueprint-bgSec/50 text-slate-200 hover:border-blueprint-teal hover:text-blueprint-teal hover:bg-blueprint-teal/10"
       }`}
     >
       {dir === "prev" ? (

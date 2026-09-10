@@ -1,5 +1,3 @@
-import videobengkelmotor from "../../public/assets/bengkelmotor.mp4";
-
 export interface Profile {
   name: string;
   avatar: string;
@@ -66,7 +64,7 @@ export interface ArsenalItem {
 
 export interface ArsenalGroupData {
   category: string;
-  iconKey: "code" | "cpu" | "cloud" | "database";
+  iconKey: "code" | "server" | "smartphone" | "wrench" | "database";
   items: ArsenalItem[];
 }
 
@@ -99,7 +97,7 @@ export const aboutOverviewData: AboutOverviewData = {
     {
       iconKey: "cpu",
       label: "Stack Utama",
-      value: "React · Laravel · Supabase",
+      value: "React · Laravel",
     },
     {
       iconKey: "rocket",
@@ -122,18 +120,18 @@ export const aboutOverviewData: AboutOverviewData = {
 
 export const arsenalData: ArsenalGroupData[] = [
   {
-    category: "Frontend_Dev",
+    category: "Frontend_Development",
     iconKey: "code",
     items: [
       {
-        name: "React Vite",
+        name: "React",
         level: "Mahir",
         icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
       },
       {
-        name: "TypeScript",
+        name: "Vite",
         level: "Mahir",
-        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg",
       },
       {
         name: "Tailwind CSS",
@@ -150,11 +148,17 @@ export const arsenalData: ArsenalGroupData[] = [
         level: "Mahir",
         icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
       },
+      {
+        name: "JavaScript",
+        level: "Mahir",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+      },
     ],
   },
+
   {
-    category: "Backend_Dev",
-    iconKey: "cpu",
+    category: "Backend_Development",
+    iconKey: "server",
     items: [
       {
         name: "Laravel",
@@ -167,20 +171,33 @@ export const arsenalData: ArsenalGroupData[] = [
         icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg",
       },
       {
-        name: "RESTful API",
+        name: "REST API",
         level: "Mahir",
-        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg",
-      },
-      {
-        name: "JavaScript",
-        level: "Mahir",
-        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg",
       },
     ],
   },
+
   {
-    category: "Cloud_Database",
-    iconKey: "cloud",
+    category: "Mobile_Development",
+    iconKey: "smartphone",
+    items: [
+      {
+        name: "Flutter",
+        level: "Menengah",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg",
+      },
+      {
+        name: "Dart",
+        level: "Menengah",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dart/dart-original.svg",
+      },
+    ],
+  },
+
+  {
+    category: "Database_Services",
+    iconKey: "database",
     items: [
       {
         name: "MySQL",
@@ -197,21 +214,22 @@ export const arsenalData: ArsenalGroupData[] = [
         level: "Mahir",
         icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/supabase/supabase-original.svg",
       },
-      {
-        name: "Docker",
-        level: "Dasar",
-        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
-      },
     ],
   },
+
   {
-    category: "Deploy_Ops",
-    iconKey: "database",
+    category: "Tools_Deployment",
+    iconKey: "wrench",
     items: [
       {
-        name: "Git / GitHub",
+        name: "Git",
         level: "Mahir",
         icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+      },
+      {
+        name: "GitHub",
+        level: "Mahir",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg",
       },
       {
         name: "Vercel",
@@ -224,9 +242,14 @@ export const arsenalData: ArsenalGroupData[] = [
         icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/railway/railway-original.svg",
       },
       {
-        name: "Linux / Bash",
+        name: "Linux",
         level: "Menengah",
         icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg",
+      },
+      {
+        name: "Docker",
+        level: "Dasar",
+        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
       },
     ],
   },
@@ -240,6 +263,7 @@ export const skillsData: SkillCategory[] = [
       { name: "PHP", level: "Mahir" },
       { name: "JavaScript", level: "Mahir" },
       { name: "TypeScript", level: "Menengah" },
+      { name: "Dart", level: "Menengah" },
     ],
   },
   {
@@ -248,6 +272,7 @@ export const skillsData: SkillCategory[] = [
       { name: "React Vite", level: "Mahir" },
       { name: "Tailwind CSS", level: "Mahir" },
       { name: "Bootstrap", level: "Mahir" },
+      { name: "flutter", level: "Mahir" },
       { name: "Three.js / React Three Fiber", level: "Dasar" },
     ],
   },
@@ -300,7 +325,7 @@ export const projectsData: Project[] = [
     githubUrl:
       "https://github.com/AzhuraaaReyy/Sistem-Manajemen-POS-BengkelMotor",
     mediaType: "video",
-    mediaUrl: videobengkelmotor,
+    mediaUrl: "",
     featured: true,
   },
   {

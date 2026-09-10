@@ -137,21 +137,21 @@ export function Hero() {
       <div className="absolute inset-0 z-0 bg-blueprint-bg/85 backdrop-blur-[3px] blueprint-grid bg-grid-size opacity-90 mix-blend-screen" />
       <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,rgba(94,234,212,0.1)_0%,rgba(11,18,32,0.8)_80%)] pointer-events-none" />
 
-      {/* Decorative Game UI Elements */}
-      <div className="absolute left-6 top-24 font-mono text-[10px] text-blueprint-teal/40 hidden md:block">
-        <div className="flex items-center gap-2 mb-2">
-          <Crosshair className="w-3 h-3" /> SYS.IDENTIFIED
+      {/* Decorative Game UI Elements (Diturunkan sejajar dengan posisi teks utama) */}
+      <div className="absolute left-6 top-[42%] -translate-y-1/2 z-10 font-mono text-[10px] text-blueprint-teal/80 hidden lg:block pointer-events-none">
+        <div className="flex items-center gap-2 mb-2 font-bold">
+          <Crosshair className="w-3.5 h-3.5 text-blueprint-teal" /> SYS.IDENTIFIED
         </div>
-        <div>REGION: ASIA_SE</div>
-        <div>LATENCY: 12ms</div>
+        <div className="tracking-widest">REGION: ASIA_SE</div>
+        <div className="tracking-widest">LATENCY: 12ms</div>
       </div>
 
-      <div className="absolute right-6 top-24 font-mono text-[10px] text-blueprint-amber/40 hidden md:block text-right">
-        <div className="flex items-center justify-end gap-2 mb-2">
-          <ShieldAlert className="w-3 h-3" /> CLEARANCE_LEVEL
+      <div className="absolute right-6 top-[42%] -translate-y-1/2 z-10 font-mono text-[10px] text-blueprint-amber/80 hidden lg:block text-right pointer-events-none">
+        <div className="flex items-center justify-end gap-2 mb-2 font-bold">
+          <ShieldAlert className="w-3.5 h-3.5 text-blueprint-amber" /> CLEARANCE_LEVEL
         </div>
-        <div>TIER: SENIOR_PROSPECT</div>
-        <div>PORT: SECURE</div>
+        <div className="tracking-widest">TIER: SENIOR_PROSPECT</div>
+        <div className="tracking-widest">PORT: SECURE</div>
       </div>
 
       {/* 3D Morphing Canvas */}
@@ -200,7 +200,7 @@ export function Hero() {
             presisi, dan intuitif."
           </motion.p>
 
-          {/* CTA Buttons (Professional but styled tactically) */}
+          {/* CTA Buttons */}
           <motion.div
             variants={itemVariants}
             className="flex flex-col sm:flex-row gap-6 justify-center w-full max-w-md"
@@ -241,7 +241,7 @@ export function Hero() {
           {/* Col 2 */}
           <div className="flex items-center justify-center gap-3 text-blueprint-textSec font-display font-bold text-xs border-x-0 md:border-x border-blueprint-teal/20 px-4">
             <Code className="w-4 h-4 text-blueprint-teal" />
-            <span className="tracking-widest">REACT • TAILWIND • NODE</span>
+            <span className="tracking-widest">REACT • LARAVEL</span>
           </div>
 
           {/* Col 3 */}

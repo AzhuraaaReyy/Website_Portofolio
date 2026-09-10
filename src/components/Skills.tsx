@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   Cpu,
   Layers,
@@ -12,7 +12,6 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-// --- IKON PRESISI SETIAP TEKNOLOGI (react-icons/si) ---
 import {
   SiHtml5,
   SiCss,
@@ -43,6 +42,11 @@ import {
   SiLinux,
   SiGnubash,
   SiGraphql,
+  SiPostman,
+  SiRailway,
+  SiFirebase,
+  SiFlutter,
+  SiDart,
 } from "react-icons/si";
 
 import {
@@ -97,6 +101,8 @@ const getSkillIcon = (skillName: string) => {
   if (name.includes("bootstrap")) return <SiBootstrap className={iconClass} />;
   if (name.includes("three")) return <SiThreedotjs className={iconClass} />;
   if (name.includes("webgl")) return <SiWebgl className={iconClass} />;
+  if (name.includes("flutter")) return <SiFlutter className={iconClass} />;
+  if (name.includes("dart")) return <SiDart className={iconClass} />;
 
   if (name.includes("laravel")) return <SiLaravel className={iconClass} />;
   if (name.includes("php")) return <SiPhp className={iconClass} />;
@@ -113,11 +119,14 @@ const getSkillIcon = (skillName: string) => {
   if (name.includes("docker")) return <SiDocker className={iconClass} />;
   if (name.includes("github")) return <SiGithub className={iconClass} />;
   if (name.includes("git")) return <SiGit className={iconClass} />;
+  if (name.includes("postman")) return <SiPostman className={iconClass} />;
 
   if (name.includes("aws") || name.includes("cloud"))
     return <Cloud className={iconClass} />;
   if (name.includes("vercel")) return <SiVercel className={iconClass} />;
   if (name.includes("netlify")) return <SiNetlify className={iconClass} />;
+  if (name.includes("railway")) return <SiRailway className={iconClass} />;
+  if (name.includes("firebase")) return <SiFirebase className={iconClass} />;
   if (name.includes("linux")) return <SiLinux className={iconClass} />;
   if (name.includes("bash")) return <SiGnubash className={iconClass} />;
 
@@ -155,7 +164,7 @@ const getProficiencyStyle = (level: string) => {
   }
 };
 
-/** Reusable Item Skill Chip dengan Indicator Dot Minimalis */
+/** Reusable Item Skill Chip */
 const SkillItem = ({
   skill,
   variants,
@@ -198,18 +207,17 @@ const SkillItem = ({
 
       <div className="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover/chip:bg-blueprint-teal transition-colors" />
 
-      <div className="flex items-center gap-2.5 min-w-0 z-10">
+      <div className="flex items-center gap-2.5 min-w-0 z-10 font-mono">
         <div
           className={`p-1.5 rounded-xs bg-blueprint-bg border border-blueprint-teal/20 transition-transform ${style.color}`}
         >
           {getSkillIcon(skill.name)}
         </div>
-        <span className="font-mono text-xs font-semibold text-blueprint-text group-hover/chip:text-white transition-colors truncate tracking-wide">
+        <span className="text-xs font-semibold text-blueprint-text group-hover/chip:text-white transition-colors truncate tracking-wide">
           {skill.name}
         </span>
       </div>
 
-      {/* Glowing Dot Indicator Minimalis */}
       <span
         className={`w-2.5 h-2.5 rounded-full flex-shrink-0 z-10 ${style.dot}`}
       />
@@ -217,7 +225,7 @@ const SkillItem = ({
   );
 };
 
-/** Reusable Card Kategori Skill */
+/** Reusable Card Kategori Skill dengan Glare Hover Terintegrasi */
 const SkillCategoryCard = ({
   category,
   index,
@@ -229,24 +237,50 @@ const SkillCategoryCard = ({
   cardVariants: Variants;
   chipVariants: Variants;
 }) => {
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+
+  const animateIn = () => {
+    const el = overlayRef.current;
+    if (!el) return;
+    el.style.transition = "none";
+    el.style.backgroundPosition = "-100% -100%";
+    el.style.transition = "650ms ease";
+    el.style.backgroundPosition = "100% 100%";
+  };
+
+  const animateOut = () => {
+    const el = overlayRef.current;
+    if (!el) return;
+    el.style.transition = "650ms ease";
+    el.style.backgroundPosition = "-100% -100%";
+  };
+
   return (
     <motion.div
       variants={cardVariants}
       whileHover={{ y: -4 }}
-      className="flex flex-col h-full bg-blueprint-bgSec/70 backdrop-blur-md border border-blueprint-teal/25 rounded-xs p-6 transition-all duration-300 shadow-md hover:shadow-blueprint-teal/10 hover:border-blueprint-teal/60 relative group"
+      onMouseEnter={animateIn}
+      onMouseLeave={animateOut}
+      className="flex flex-col h-full bg-blueprint-bgSec/70 backdrop-blur-md border border-blueprint-teal/25 rounded-xs p-6 transition-all duration-300 shadow-md hover:shadow-blueprint-teal/10 hover:border-blueprint-teal/60 relative group overflow-hidden cursor-pointer font-mono"
     >
-      <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-blueprint-teal/60 group-hover:border-blueprint-amber transition-colors" />
-      <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-blueprint-teal/60 group-hover:border-blueprint-amber transition-colors" />
-      <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-blueprint-teal/60 group-hover:border-blueprint-amber transition-colors" />
-      <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-blueprint-teal/60 group-hover:border-blueprint-amber transition-colors" />
+      {/* GLARE HOVER OVERLAY LAYER */}
+      <div
+        ref={overlayRef}
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{
+          background: `linear-gradient(-45deg, rgba(0,0,0,0) 60%, rgba(94, 234, 212, 0.25) 70%, rgba(0,0,0,0) 100%)`,
+          backgroundSize: "250% 250%",
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "-100% -100%",
+        }}
+      />
 
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blueprint-teal/5 to-transparent -translate-y-full group-hover:translate-y-full transition-transform duration-1000 ease-in-out pointer-events-none" />
-
+      {/* HEADER CARD */}
       <div className="flex items-center justify-between pb-4 mb-5 border-b border-blueprint-teal/20 relative z-10">
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-1.5 font-mono text-[10px] text-blueprint-teal tracking-widest uppercase">
+          <div className="flex items-center gap-1.5 text-[10px] text-blueprint-teal tracking-widest uppercase">
             <Target className="w-3 h-3 text-blueprint-amber animate-pulse" />
-            <span>MODUL KEAHLIan // 0{index + 1}</span>
+            <span>MODUL KEAHLIAN // 0{index + 1}</span>
           </div>
           <h3 className="font-display font-black text-lg text-blueprint-text tracking-wider uppercase group-hover:text-blueprint-teal transition-colors">
             {category.title}
@@ -257,13 +291,15 @@ const SkillCategoryCard = ({
         </div>
       </div>
 
+      {/* LIST CHIPS SKILL */}
       <div className="flex flex-col gap-2.5 flex-grow relative z-10">
         {category.skills.map((skill, sIdx) => (
           <SkillItem key={sIdx} skill={skill} variants={chipVariants} />
         ))}
       </div>
 
-      <div className="mt-5 pt-3.5 border-t border-blueprint-teal/15 flex justify-between items-center font-mono text-[11px] text-blueprint-textSec relative z-10">
+      {/* FOOTER CARD */}
+      <div className="mt-5 pt-3.5 border-t border-blueprint-teal/15 flex justify-between items-center text-[11px] text-blueprint-textSec relative z-10">
         <span className="flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 bg-blueprint-teal rounded-full animate-ping" />
           STATUS MODUL
@@ -315,11 +351,13 @@ export function Skills() {
       transition: { duration: 0.2 },
     },
   };
+
   const steps = (n: number) => (t: number) => Math.floor(t * n) / n;
+
   return (
     <section
       id="skills"
-      className="py-24 bg-blueprint-bg relative section-scroll overflow-hidden border-t border-blueprint-teal/20 select-none"
+      className="py-24 bg-blueprint-bg relative section-scroll overflow-hidden border-t border-blueprint-teal/20 select-none font-mono"
     >
       <AmbientBackground
         glowIntensity={0.15}
@@ -337,9 +375,9 @@ export function Skills() {
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="mb-12 flex flex-col items-start gap-5 text-left">
-          <div className="font-mono font-bold text-xs tracking-widest text-blueprint-teal px-3 py-1 bg-blueprint-teal/10 border-l-4 border-blueprint-teal inline-flex items-center gap-2">
+          <div className="font-bold text-xs tracking-widest text-blueprint-teal px-3 py-1 bg-blueprint-teal/10 border-l-4 border-blueprint-teal inline-flex items-center gap-2">
             <Target className="w-3.5 h-3.5 text-blueprint-amber animate-spin-slow" />
-            SPESIFIKASI_TEKNIS // DOMAIN_KEAHLIAN
+            PROFIL_TEKNIS // TECHNICAL_STACK
           </div>
 
           <div className="relative inline-block group cursor-default select-none">
@@ -392,34 +430,32 @@ export function Skills() {
               KAPABILITAS TEKNIS
             </motion.h2>
 
-            {/* TEKS UTAMA (BASE TITLE) */}
+            {/* TEKS UTAMA */}
             <h2 className="relative text-4xl md:text-5xl lg:text-6xl font-black font-display text-blueprint-text tracking-tighter drop-shadow-[0_0_20px_rgba(94,234,212,0.4)] hover:text-blueprint-teal transition-colors duration-300 uppercase italic skew-x-[-5deg] z-10">
               KAPABILITAS TEKNIS
             </h2>
           </div>
 
-          {/* Container Flex Side-by-Side: Teks di Kiri, Status Metrics di Kanan */}
           <div className="w-full flex flex-col lg:flex-row items-start justify-between gap-6 pt-4 border-t border-blueprint-teal/15">
-            {/* Teks Narasi (Kiri) */}
-            <p className="flex-1 text-justify text-sm md:text-base text-blueprint-textSec leading-relaxed font-sans">
-              Berikut adalah pemetaan kompetensi teknis yang saya terapkan dalam
-              pengembangan aplikasi web secara menyeluruh (<em>end-to-end</em>).
-              Fokus utama saya berfokus pada pembangunan antarmuka pengguna yang
-              interaktif, performan, dan responsif (Frontend) berbasis{" "}
+            <p className="flex-1 text-justify text-xs sm:text-sm text-slate-300 w-full text-justify leading-relaxed border-l-2 border-blueprint-teal/40 pl-3 mt-2">
+              Saya berfokus pada pengembangan aplikasi web dengan pengalaman
+              mengerjakan frontend, backend, API, dan basis data. Dalam
+              pengembangan frontend, saya menggunakan{" "}
               <span className="text-blueprint-teal font-semibold">
-                React, TypeScript, dan Tailwind CSS
-              </span>
-              , serta perancangan arsitektur server, integrasi API, dan
-              pengelolaan basis data yang andal (Backend) menggunakan{" "}
-              <span className="text-blueprint-teal font-semibold">
-                Node.js, Express, dan Laravel
-              </span>
-              . Setiap modul di bawah dikelompokkan berdasarkan area keahlian
-              beserta tingkat kemahiran operasional dalam proyek nyata.
+                React dan Tailwind CSS
+              </span>{" "}
+              untuk membangun antarmuka yang responsif dan terstruktur,
+              sementara{" "}
+              <span className="text-blueprint-teal font-semibold">Laravel</span>{" "}
+              saya gunakan untuk pengembangan backend dan layanan API. Saya juga
+              memiliki pengalaman menggunakan{" "}
+              <span className="text-blueprint-teal font-semibold">Flutter</span>{" "}
+              dalam pengembangan aplikasi mobile. Teknologi di bawah ini
+              mencerminkan tools yang pernah saya gunakan dalam proyek dan
+              dikelompokkan berdasarkan area pengembangannya.
             </p>
 
-            {/* HUD Status Bar Metrics (Kanan) */}
-            <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5 font-mono text-xs text-blueprint-textSec flex-shrink-0 w-full sm:w-auto lg:min-w-[230px]">
+            <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5 text-xs text-blueprint-textSec flex-shrink-0 w-full sm:w-auto lg:min-w-[230px]">
               <div className="flex items-center justify-between gap-3 bg-blueprint-bgSec/60 border border-blueprint-teal/20 px-3.5 py-2.5 rounded-xs">
                 <span className="flex items-center gap-2">
                   <Folder className="w-3.5 h-3.5 text-blueprint-teal" />
@@ -443,7 +479,7 @@ export function Skills() {
               <div className="flex items-center justify-between gap-3 bg-blueprint-bgSec/60 border border-blueprint-teal/20 px-3.5 py-2.5 rounded-xs">
                 <span className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>SIAP PAKAI:</span>
+                  <span>DIGUNAKAN:</span>
                 </span>
                 <strong className="text-emerald-400">
                   {mahirCount} TEKNOLOGI
