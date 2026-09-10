@@ -12,7 +12,6 @@ import {
   Briefcase,
   Cpu,
   Database,
-  Cloud,
   Code2,
   Award,
   Target,
