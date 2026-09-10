@@ -81,7 +81,7 @@ export const profileData: Profile = {
   email: "muhammadrizal52@gmail.com",
   whatsapp: "https://wa.me/6283162253730",
   github: "https://github.com/AzhuraaaReyy",
-  linkedin: "https://linkedin.com/in/aryazhur",
+  linkedin: "https://www.linkedin.com/in/muhammad-rizal-0495b63a0/",
 };
 
 export const aboutOverviewData: AboutOverviewData = {

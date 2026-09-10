@@ -164,7 +164,7 @@ const AboutData: AboutSlide[] = [
   {
     id: "02",
     key: "skill_tree",
-    label: "Keahlian",
+    label: "Keahlian Saya",
     icon: <Crosshair className="w-3.5 h-3.5" />,
     accent: "amber",
     headline: "Penguasaan Teknologi",
@@ -176,7 +176,7 @@ const AboutData: AboutSlide[] = [
   {
     id: "03",
     key: "field_ops",
-    label: "Pengalaman",
+    label: "Pengalaman Saya",
     icon: <Briefcase className="w-3.5 h-3.5" />,
     accent: "teal",
     headline: "Riwayat Proyek & Peran",
@@ -195,7 +195,7 @@ const AboutData: AboutSlide[] = [
   {
     id: "04",
     key: "academy",
-    label: "Pendidikan",
+    label: "Pendidikan Saya",
     icon: <GraduationCap className="w-3.5 h-3.5" />,
     accent: "violet",
     headline: "Latar Belakang Akademis",
@@ -215,7 +215,7 @@ const AboutData: AboutSlide[] = [
   {
     id: "05",
     key: "contact",
-    label: "Kontak",
+    label: "Kontak Saya",
     icon: <UserPlus className="w-3.5 h-3.5" />,
     accent: "amber",
     headline: "Hubungi Saya",
@@ -528,7 +528,7 @@ export function About() {
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-blueprint-text tracking-tight uppercase italic">
-              Operator <span className={accent.text}>{active.label}</span>
+              Profile <span className={accent.text}>{active.label}</span>
             </h2>
           </div>
           <div className="flex items-center gap-2 font-mono text-[10px] text-blueprint-textSec">
