@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 
 interface ParticleCanvasProps {
   scrollProgress: number;
+  frameloop?: "always" | "never" | "demand";
 }
 
 function CameraController({ scrollProgress }: { scrollProgress: number }) {
@@ -33,7 +34,7 @@ function CameraController({ scrollProgress }: { scrollProgress: number }) {
   return null;
 }
 
-export function ParticleCanvas({ scrollProgress }: ParticleCanvasProps) {
+export function ParticleCanvas({ scrollProgress, frameloop = "always" }: ParticleCanvasProps) {
   const [webGlSupported, setWebGlSupported] = useState(true);
 
   // Detect WebGL availability
@@ -66,6 +67,7 @@ export function ParticleCanvas({ scrollProgress }: ParticleCanvasProps) {
       <Canvas
         camera={{ position: [0, 0, 5.5], fov: 60 }}
         gl={{ antialias: true, alpha: true }}
+        frameloop={frameloop}
       >
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={1.5} />

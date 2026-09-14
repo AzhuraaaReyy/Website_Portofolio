@@ -11,6 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+# Environment files (token secret) — jangan pernah commit
+.env
+.env.local
+.env.*.local
+!.env.example
 AGENTS.md
 # Editor directories and files
 .vscode/*

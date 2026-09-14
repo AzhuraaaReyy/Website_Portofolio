@@ -1,6 +1,7 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, lazy, Suspense } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
-import Lanyard from "./Lanyard";
+
+const Lanyard = lazy(() => import("./Lanyard"));
 import {
   Crosshair,
   ChevronLeft,
@@ -456,6 +457,84 @@ function Panel({
 }
 
 /* ============================================================
+   3D Lanyard khusus tab "overview":
+   - Muat (import chunk + card.glb) hanya saat panel mendekati layar.
+   - Matikan render loop saat panel di luar viewport (hemat CPU/GPU).
+   ============================================================ */
+function OverviewLanyard({
+  position,
+  frontImage,
+  backImage,
+}: {
+  position: [number, number, number];
+  frontImage: string;
+  backImage: string;
+}) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [nearViewport, setNearViewport] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setNearViewport(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -150px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setVisible(entry.isIntersecting),
+      { rootMargin: "300px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={wrapRef}
+      className="relative z-10 w-full h-full flex items-center justify-center pointer-events-auto"
+    >
+      {nearViewport ? (
+        <Suspense
+          fallback={
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="w-10 h-10 border-2 border-blueprint-teal/40 border-t-blueprint-teal rounded-full animate-spin" />
+            </div>
+          }
+        >
+          <Lanyard
+            position={position}
+            gravity={[0, -40, 0]}
+            frontImage={frontImage}
+            backImage={backImage}
+            imageFit="cover"
+            lanyardWidth={1.5}
+            frameloop={visible ? "always" : "never"}
+          />
+        </Suspense>
+      ) : (
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="w-10 h-10 border-2 border-blueprint-teal/40 border-t-blueprint-teal rounded-full animate-pulse" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ============================================================
    MAIN COMPONENT
    ============================================================ */
 export function About() {
@@ -627,16 +706,11 @@ export function About() {
                 <HudOverlay />
 
                 {active.key === "overview" ? (
-                  <div className="relative z-10 w-full h-full flex items-center justify-center pointer-events-auto">
-                    <Lanyard
-                      position={[0, 0, 16]}
-                      gravity={[0, -40, 0]}
-                      frontImage={active.image || profileData.avatar}
-                      backImage={active.image || profileData.avatar}
-                      imageFit="cover"
-                      lanyardWidth={1.5}
-                    />
-                  </div>
+                  <OverviewLanyard
+                    position={[0, 0, 16]}
+                    frontImage={active.image || profileData.avatar}
+                    backImage={active.image || profileData.avatar}
+                  />
                 ) : active.image ? (
                   <div className="relative z-10 flex items-center justify-center w-full h-full p-4">
                     <img

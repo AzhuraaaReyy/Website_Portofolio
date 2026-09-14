@@ -101,6 +101,11 @@ export function MorphingParticles({ scrollProgress }: MorphingParticlesProps) {
     return new Float32Array(particleCount * 3);
   }, [particleCount]);
 
+  // Reusable morph target buffer (allocated once) to avoid GC churn per frame
+  const morphTarget = useMemo(() => {
+    return new Float32Array(particleCount * 3);
+  }, [particleCount]);
+
   // Handle morph target calculation and interpolation frame loop
   useFrame((state) => {
     if (!pointsRef.current) return;
@@ -119,24 +124,24 @@ export function MorphingParticles({ scrollProgress }: MorphingParticlesProps) {
       if (scrollProgress < 0.33) {
         // Morph from Sphere (0.0) to Database (0.33)
         const t = scrollProgress / 0.33;
-        target = new Float32Array(particleCount * 3);
         for (let i = 0; i < particleCount * 3; i++) {
-          target[i] = THREE.MathUtils.lerp(spherePos[i], dbPos[i], t);
+          morphTarget[i] = THREE.MathUtils.lerp(spherePos[i], dbPos[i], t);
         }
+        target = morphTarget;
       } else if (scrollProgress < 0.66) {
         // Morph from Database (0.33) to React Atom (0.66)
         const t = (scrollProgress - 0.33) / 0.33;
-        target = new Float32Array(particleCount * 3);
         for (let i = 0; i < particleCount * 3; i++) {
-          target[i] = THREE.MathUtils.lerp(dbPos[i], reactPos[i], t);
+          morphTarget[i] = THREE.MathUtils.lerp(dbPos[i], reactPos[i], t);
         }
+        target = morphTarget;
       } else {
         // Morph from React Atom (0.66) to Blueprint Grid (1.0)
         const t = Math.min(1, (scrollProgress - 0.66) / 0.34);
-        target = new Float32Array(particleCount * 3);
         for (let i = 0; i < particleCount * 3; i++) {
-          target[i] = THREE.MathUtils.lerp(reactPos[i], gridPos[i], t);
+          morphTarget[i] = THREE.MathUtils.lerp(reactPos[i], gridPos[i], t);
         }
+        target = morphTarget;
       }
     }
 

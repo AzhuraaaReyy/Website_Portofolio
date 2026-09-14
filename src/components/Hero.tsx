@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import {
   Terminal,
   Code,
@@ -9,7 +9,10 @@ import {
 import { motion, type Variants } from "framer-motion";
 import { profileData } from "../data/portfolioData";
 import { useReducedMotion } from "../hooks/useReducedMotion";
-import { ParticleCanvas } from "./3d/ParticleCanvas";
+
+const ParticleCanvas = lazy(() =>
+  import("./3d/ParticleCanvas").then((m) => ({ default: m.ParticleCanvas }))
+);
 
 const GithubIcon = ({ className }: { className?: string }) => (
   <svg
@@ -44,21 +47,55 @@ const LinkedinIcon = ({ className }: { className?: string }) => (
 
 export function Hero() {
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [heroInView, setHeroInView] = useState(true);
   const heroRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
 
+  // Hentikan render loop 3D saat Hero di luar layar (hemat CPU/GPU saat scroll).
   useEffect(() => {
-    const handleScroll = () => {
+    const el = heroRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setHeroInView(entry.isIntersecting),
+      { rootMargin: "50px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    let ticking = false;
+    let heroHeight = 0;
+
+    const measure = () => {
       if (!heroRef.current) return;
-      const rect = heroRef.current.getBoundingClientRect();
-      const heroHeight = rect.height;
-      const scrolled = window.scrollY;
-      const progress = Math.max(0, Math.min(1, scrolled / heroHeight));
+      heroHeight = heroRef.current.offsetHeight;
+    };
+
+    const handleScroll = () => {
+      const progress = Math.max(
+        0,
+        Math.min(1, window.scrollY / (heroHeight || 1)),
+      );
       setScrollProgress(progress);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        handleScroll();
+        ticking = false;
+      });
+    };
+
+    measure();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", measure);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", measure);
+    };
   }, []);
 
   const handleScrollToProjects = (
@@ -124,6 +161,7 @@ export function Hero() {
           muted
           loop
           playsInline
+          preload="metadata"
           className="w-full h-full object-cover"
         >
           <source
@@ -155,7 +193,19 @@ export function Hero() {
       </div>
 
       {/* 3D Morphing Canvas */}
-      <ParticleCanvas scrollProgress={scrollProgress} />
+      <Suspense
+        fallback={
+          <div
+            className="absolute inset-0 w-full h-full pointer-events-none z-0"
+            aria-hidden="true"
+          />
+        }
+      >
+        <ParticleCanvas
+          scrollProgress={scrollProgress}
+          frameloop={heroInView || reducedMotion ? "always" : "never"}
+        />
+      </Suspense>
 
       {/* Hero Content Center */}
       <div className="w-full max-w-6xl mx-auto px-6 z-10 text-center relative flex-1 flex flex-col items-center justify-center pt-20 pb-20">

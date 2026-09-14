@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Gamepad2, Wifi } from "lucide-react";
+import { Menu, X, Gamepad2, Wifi, RefreshCw } from "lucide-react";
 import { useReducedMotion } from "../hooks/useReducedMotion";
+import type { LevelingSummary } from "../lib/levelingEngine";
 
 interface NavbarProps {
   activeSection?: string;
+  summary?: LevelingSummary | null;
+  loading?: boolean;
+  error?: boolean;
+  onRetry?: () => void;
 }
 
 function PingStatus() {
@@ -40,11 +45,17 @@ function PingStatus() {
   );
 }
 
-export function Navbar({ activeSection: activeSectionProp }: NavbarProps) {
+export function Navbar({
+  activeSection: activeSectionProp,
+  summary,
+  loading = false,
+  error = false,
+  onRetry,
+}: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [currentActive, setCurrentActive] = useState(
-    activeSectionProp || "home",
+    activeSectionProp || "home"
   );
 
   const navLinks = [
@@ -52,6 +63,7 @@ export function Navbar({ activeSection: activeSectionProp }: NavbarProps) {
     { label: "TENTANG SAYA", href: "#about" },
     { label: "KEAHLIAN", href: "#skills" },
     { label: "PROYEK", href: "#projects" },
+    { label: "STATISTIK", href: "#stats" },
     { label: "PENGALAMAN", href: "#experience" },
     { label: "KONTAK", href: "#contact" },
   ];
@@ -63,34 +75,26 @@ export function Navbar({ activeSection: activeSectionProp }: NavbarProps) {
   }, [activeSectionProp]);
 
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-
-      const scrollPosition = window.scrollY + 120;
-
-      for (let i = navLinks.length - 1; i >= 0; i--) {
-        const targetId = navLinks[i].href.substring(1);
-        const sectionEl = document.getElementById(targetId);
-
-        if (sectionEl) {
-          const top = sectionEl.offsetTop;
-          if (scrollPosition >= top) {
-            setCurrentActive(targetId);
-            break;
-          }
-        }
-      }
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 20);
+        ticking = false;
+      });
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [navLinks]);
+  }, []);
 
   const handleLinkClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    href: string,
+    href: string
   ) => {
     e.preventDefault();
     setIsOpen(false);
@@ -110,6 +114,11 @@ export function Navbar({ activeSection: activeSectionProp }: NavbarProps) {
       });
     }
   };
+
+  const progressPercent = Math.min(
+    100,
+    Math.max(0, Math.round((summary?.progress ?? 0) * 100))
+  );
 
   return (
     <nav
@@ -142,22 +151,39 @@ export function Navbar({ activeSection: activeSectionProp }: NavbarProps) {
               <div className="flex items-center gap-2 font-mono text-[9px] sm:text-[10px] tracking-wider leading-none mt-1">
                 <div className="flex items-center gap-1">
                   <span className="text-blueprint-textSec">LVL</span>
-                  <span className="font-display font-black text-blueprint-teal">
-                    99
-                  </span>
+                  {loading ? (
+                    <span className="w-5 h-4 animate-pulse bg-blueprint-teal/20 inline-block" />
+                  ) : (
+                    <span className="font-display font-black text-blueprint-teal">
+                      {error ? "--" : summary?.level ?? 1}
+                    </span>
+                  )}
                 </div>
 
-                {/* Progress Bar Level */}
-                <div className="w-10 sm:w-14 h-1.5 bg-blueprint-bg/80 border border-blueprint-teal/30 p-[1px] relative overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-blueprint-teal via-blueprint-teal to-blueprint-amber w-[85%] shadow-[0_0_6px_rgba(94,234,212,0.8)]" />
+                {/* Progress Bar Mini khusus Navbar */}
+                <div className="w-12 sm:w-16 h-1.5 bg-blueprint-bg border border-blueprint-teal/40 p-[1px] relative overflow-hidden">
+                  <div
+                    className="h-full bg-blueprint-teal transition-all duration-500 shadow-[0_0_8px_#5EEAD4]"
+                    style={{ width: `${error ? 0 : progressPercent}%` }}
+                  />
                 </div>
 
                 <div className="flex items-center gap-1">
                   <span className="text-blueprint-textSec">RANK</span>
                   <span className="font-display font-black text-blueprint-amber">
-                    S+
+                    {error ? "OFFLINE" : "RIZAL"}
                   </span>
                 </div>
+
+                {error && onRetry && (
+                  <button
+                    onClick={onRetry}
+                    aria-label="Coba lagi sinkronisasi level"
+                    className="flex items-center gap-1 text-blueprint-amber hover:text-white transition-colors cursor-pointer"
+                  >
+                    <RefreshCw className="w-3 h-3" />
+                  </button>
+                )}
 
                 <span className="text-blueprint-teal/30">|</span>
 
@@ -172,7 +198,7 @@ export function Navbar({ activeSection: activeSectionProp }: NavbarProps) {
           </a>
         </div>
 
-        {/* Right Side: Desktop Menu (Mepet Kanan & Tanpa Background) */}
+        {/* Right Side: Desktop Menu */}
         <div className="hidden lg:flex items-center gap-1 ml-auto">
           {navLinks.map((link) => {
             const linkId = link.href.substring(1);
@@ -228,12 +254,20 @@ export function Navbar({ activeSection: activeSectionProp }: NavbarProps) {
             <div className="flex items-center gap-2 font-mono text-xs">
               <span className="text-blueprint-textSec">
                 LVL{" "}
-                <strong className="text-blueprint-teal font-black">99</strong>
+                {loading ? (
+                  <strong className="w-5 h-4 animate-pulse bg-blueprint-teal/20 inline-block align-middle" />
+                ) : (
+                  <strong className="text-blueprint-teal font-black">
+                    {error ? "--" : summary?.level ?? 1}
+                  </strong>
+                )}
               </span>
               <span className="text-blueprint-teal/30">|</span>
               <span className="text-blueprint-textSec">
                 RANK{" "}
-                <strong className="text-blueprint-amber font-black">S+</strong>
+                <strong className="text-blueprint-amber font-black">
+                  {error ? "OFFLINE" : "RIZAL"}
+                </strong>
               </span>
               <span className="text-blueprint-teal/30">|</span>
               <PingStatus />
