@@ -1,4 +1,10 @@
-import { LEVELING_CONFIG } from "../data/levelingConfig";
+import {
+  LEVELING_CONFIG,
+  LEVELING_TIERS,
+  type Tier,
+} from "../data/levelingConfig";
+
+export type { Tier } from "../data/levelingConfig";
 
 export type LanguageCategory = "utama" | "programming" | "markup" | "unknown";
 
@@ -18,6 +24,7 @@ export interface LanguageStat {
 
 export interface LevelingSummary {
   level: number;
+  tier: Tier;
   currentExp: number;
   requiredExp: number;
   progress: number;
@@ -55,12 +62,46 @@ export function expForRepo(languages: string[]): number {
   return LEVELING_CONFIG.baseProjectExp + languageExp;
 }
 
+/**
+ * Target EXP kumulatif untuk MENCAPAI level `level` (rumus kuadratik):
+ * targetExp(level) = 100 × level² → level 2 = 400, level 9 = 8.100,
+ * max level 100 = 1.000.000.
+ */
+export function targetExpToLevel(level: number): number {
+  return Math.floor(
+    LEVELING_CONFIG.curveCoefficient *
+      Math.pow(level, LEVELING_CONFIG.curveExponent),
+  );
+}
+
+/**
+ * EXP yang dibutuhkan untuk naik DARI level `level` ke level berikutnya
+ * (selisih dua target kumulatif berurutan = 100 × (2·level + 1)).
+ */
 export function expToNext(level: number): number {
   if (level >= LEVELING_CONFIG.maxLevel) return 0;
-  return Math.floor(
-    LEVELING_CONFIG.curveBase *
-      Math.pow(LEVELING_CONFIG.curveMultiplier, level - 1),
-  );
+  return targetExpToLevel(level + 1) - targetExpToLevel(level);
+}
+
+/**
+ * Total EXP kumulatif yang dibutuhkan untuk MENCAPAI level `nextLevel`.
+ * Dipakai UI agar progress = akumulasi nyata (mis. 12.000 PTS) terhadap
+ * target level berikutnya — bukan sisa di dalam level yang membuat angka
+ * terkesan "belum sesuai" dengan akumulasi.
+ */
+export function cumulativeExpToLevel(nextLevel: number): number {
+  return targetExpToLevel(nextLevel);
+}
+
+/**
+ * Gelar (tier) dari sebuah level — memetakan level ke rentang jabatan
+ * pada `LEVELING_TIERS` (mis. level 30 → Mid-Level Full-Stack Engineer).
+ */
+export function tierFromLevel(level: number): Tier {
+  for (const tier of LEVELING_TIERS) {
+    if (level >= tier.minLevel && level <= tier.maxLevel) return tier;
+  }
+  return LEVELING_TIERS[LEVELING_TIERS.length - 1];
 }
 
 export function progressFromExp(totalExp: number): {
@@ -69,25 +110,29 @@ export function progressFromExp(totalExp: number): {
   requiredExp: number;
   progress: number;
 } {
-  let remaining = Math.max(0, totalExp);
+  const raw = Math.max(0, totalExp);
   let level = 1;
   while (level < LEVELING_CONFIG.maxLevel) {
-    const need = expToNext(level);
-    if (remaining >= need) {
-      remaining -= need;
+    if (raw >= targetExpToLevel(level + 1)) {
       level += 1;
     } else {
       break;
     }
   }
-  const requiredExp = expToNext(level);
-  const progress = requiredExp > 0 ? remaining / requiredExp : 1;
-  return { level, currentExp: remaining, requiredExp, progress };
+  // currentExp = total akumulasi nyata, requiredExp = target kumulatif menuju
+  // level berikutnya, progress = akumulasi / target (persen menuju capaian).
+  const currentExp = raw;
+  const requiredExp =
+    level >= LEVELING_CONFIG.maxLevel ? 0 : cumulativeExpToLevel(level + 1);
+  const progress =
+    requiredExp > 0 ? Math.min(1, currentExp / requiredExp) : 1;
+  return { level, currentExp, requiredExp, progress };
 }
 
 export function summarize(repoStats: RepoStat[]): LevelingSummary {
   const totalExp = repoStats.reduce((sum, r) => sum + r.exp, 0);
   const { level, currentExp, requiredExp, progress } = progressFromExp(totalExp);
+  const tier = tierFromLevel(level);
 
   const languageMap = new Map<
     string,
@@ -118,6 +163,7 @@ export function summarize(repoStats: RepoStat[]): LevelingSummary {
 
   return {
     level,
+    tier,
     currentExp,
     requiredExp,
     progress,

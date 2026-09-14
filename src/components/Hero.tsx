@@ -6,43 +6,16 @@ import {
   ShieldAlert,
   Crosshair,
 } from "lucide-react";
-import { motion, type Variants } from "framer-motion";
 import { profileData } from "../data/portfolioData";
 import { useReducedMotion } from "../hooks/useReducedMotion";
+import { GithubIcon, LinkedinIcon } from "./ui/SocialIcons";
 
 const ParticleCanvas = lazy(() =>
-  import("./3d/ParticleCanvas").then((m) => ({ default: m.ParticleCanvas }))
+  import("./3d/ParticleCanvas").then((m) => ({ default: m.ParticleCanvas })),
 );
 
-const GithubIcon = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-    <path d="M9 18c-4.51 2-5-2-7-2" />
-  </svg>
-);
-
-const LinkedinIcon = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-    <rect x="2" y="9" width="4" height="12" />
-    <circle cx="4" cy="4" r="2" />
-  </svg>
+const HeroAnimated = lazy(() =>
+  import("./HeroAnimated").then((m) => ({ default: m.HeroAnimated })),
 );
 
 export function Hero() {
@@ -106,7 +79,7 @@ export function Hero() {
     if (projectsSection) {
       const offset = 80;
       const elementPosition = projectsSection.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      const offsetPosition = elementPosition + window.scrollY - offset;
       window.scrollTo({
         top: offsetPosition,
         behavior: "smooth",
@@ -122,30 +95,12 @@ export function Hero() {
     if (contactSection) {
       const offset = 80;
       const elementPosition = contactSection.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      const offsetPosition = elementPosition + window.scrollY - offset;
       window.scrollTo({
         top: offsetPosition,
         behavior: "smooth",
       });
     }
-  };
-
-  const containerVariants: Variants = {
-    hidden: {},
-    visible: {
-      transition: {
-        staggerChildren: reducedMotion ? 0 : 0.15,
-      },
-    },
-  };
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: reducedMotion ? 0 : 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
-    },
   };
 
   return (
@@ -154,14 +109,14 @@ export function Hero() {
       ref={heroRef}
       className="relative min-h-screen flex flex-col justify-center overflow-hidden section-scroll"
     >
-      {/* Background Video */}
-      <div className="absolute inset-0 w-full h-full z-0">
+      <div className="absolute inset-0 w-full h-full z-0 hidden md:block">
         <video
           autoPlay
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="none"
+          poster="/path/to/poster-image.jpg" // Ganti dengan gambar statis yang ringan
           className="w-full h-full object-cover"
         >
           <source
@@ -178,7 +133,8 @@ export function Hero() {
       {/* Decorative Game UI Elements (Diturunkan sejajar dengan posisi teks utama) */}
       <div className="absolute left-6 top-[42%] -translate-y-1/2 z-10 font-mono text-[10px] text-blueprint-teal/80 hidden lg:block pointer-events-none">
         <div className="flex items-center gap-2 mb-2 font-bold">
-          <Crosshair className="w-3.5 h-3.5 text-blueprint-teal" /> SYS.IDENTIFIED
+          <Crosshair className="w-3.5 h-3.5 text-blueprint-teal" />{" "}
+          SYS.IDENTIFIED
         </div>
         <div className="tracking-widest">REGION: ASIA_SE</div>
         <div className="tracking-widest">LATENCY: 12ms</div>
@@ -186,7 +142,8 @@ export function Hero() {
 
       <div className="absolute right-6 top-[42%] -translate-y-1/2 z-10 font-mono text-[10px] text-blueprint-amber/80 hidden lg:block text-right pointer-events-none">
         <div className="flex items-center justify-end gap-2 mb-2 font-bold">
-          <ShieldAlert className="w-3.5 h-3.5 text-blueprint-amber" /> CLEARANCE_LEVEL
+          <ShieldAlert className="w-3.5 h-3.5 text-blueprint-amber" />{" "}
+          CLEARANCE_LEVEL
         </div>
         <div className="tracking-widest">TIER: SENIOR_PROSPECT</div>
         <div className="tracking-widest">PORT: SECURE</div>
@@ -203,77 +160,29 @@ export function Hero() {
       >
         <ParticleCanvas
           scrollProgress={scrollProgress}
-          frameloop={heroInView || reducedMotion ? "always" : "never"}
+          frameloop={heroInView ? "always" : "never"}
         />
       </Suspense>
 
       {/* Hero Content Center */}
       <div className="w-full max-w-6xl mx-auto px-6 z-10 text-center relative flex-1 flex flex-col items-center justify-center pt-20 pb-20">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="flex flex-col items-center w-full"
-        >
-          {/* Top Status Badge (Professional Title) */}
-          <motion.div
-            variants={itemVariants}
-            className="font-display font-black text-xs tracking-widest text-blueprint-bg bg-blueprint-amber px-6 py-1.5 skew-x-[-15deg] mb-6 shadow-[0_0_15px_rgba(245,183,84,0.4)]"
+        {reducedMotion ? (
+          <HeroStaticContent
+            onScrollToProjects={handleScrollToProjects}
+            onScrollToContact={handleScrollToContact}
+          />
+        ) : (
+          <Suspense
+            fallback={
+              <HeroStaticContent
+                onScrollToProjects={handleScrollToProjects}
+                onScrollToContact={handleScrollToContact}
+              />
+            }
           >
-            <span className="skew-x-[15deg] block">
-              [{profileData.role.toUpperCase()}]
-            </span>
-          </motion.div>
-
-          {/* Futuristic Professional Heading */}
-          <motion.div
-            variants={itemVariants}
-            className="relative mb-6 group cursor-default"
-          >
-            {/* Solid Glow Text (First word) */}
-            <h1 className="text-5xl md:text-7xl lg:text-9xl font-display font-black text-blueprint-teal italic leading-none tracking-tighter uppercase drop-shadow-[0_0_30px_rgba(94,234,212,0.6)] transition-all">
-              {profileData.role.split(" ")[0]}
-            </h1>
-            {/* Solid Glow Text (Second word) */}
-            <h1 className="text-5xl md:text-7xl lg:text-9xl font-display font-black text-white italic -mt-5 md:-mt-8 lg:-mt-12 leading-none tracking-tighter uppercase drop-shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-all">
-              {profileData.role.split(" ").slice(1).join(" ")}
-            </h1>
-          </motion.div>
-
-          {/* Subtitle / Professional Mission Statement */}
-          <motion.p
-            variants={itemVariants}
-            className="font-sans font-medium text-sm md:text-base text-blueprint-textSec max-w-xl mx-auto mb-10 bg-blueprint-bgSec/50 p-4 border-l-4 border-blueprint-teal backdrop-blur-sm"
-          >
-            "Fokus membangun solusi web fullstack end-to-end dari arsitektur
-            backend yang stabil hingga antarmuka frontend yang responsif,
-            presisi, dan intuitif."
-          </motion.p>
-
-          {/* CTA Buttons */}
-          <motion.div
-            variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-6 justify-center w-full max-w-md"
-          >
-            <a
-              href="#projects"
-              onClick={handleScrollToProjects}
-              className="group relative flex-1 bg-blueprint-teal text-blueprint-bg font-display font-black text-sm px-8 py-4 skew-x-[-10deg] hover:bg-white transition-all shadow-[0_0_20px_rgba(94,234,212,0.4)] hover:shadow-[0_0_30px_rgba(255,255,255,0.6)] flex items-center justify-center"
-            >
-              <span className="skew-x-[10deg] flex items-center gap-2">
-                LIHAT PROYEK
-                <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </span>
-            </a>
-            <a
-              href="#contact"
-              onClick={handleScrollToContact}
-              className="group relative flex-1 bg-blueprint-bgSec/80 backdrop-blur-sm text-blueprint-text border-2 border-blueprint-teal/40 font-display font-bold text-sm px-8 py-4 skew-x-[-10deg] hover:border-blueprint-teal hover:text-blueprint-teal hover:bg-blueprint-teal/10 transition-all flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)]"
-            >
-              <span className="skew-x-[10deg]">HUBUNGI SAYA</span>
-            </a>
-          </motion.div>
-        </motion.div>
+            <HeroAnimated reducedMotion={reducedMotion} />
+          </Suspense>
+        )}
       </div>
 
       {/* HUD / Footer Status Strip */}
@@ -323,5 +232,66 @@ export function Hero() {
         </div>
       </div>
     </section>
+  );
+}
+
+type ScrollHandler = (
+  e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
+) => void;
+
+function HeroStaticContent({
+  onScrollToProjects,
+  onScrollToContact,
+}: {
+  onScrollToProjects: ScrollHandler;
+  onScrollToContact: ScrollHandler;
+}) {
+  return (
+    <div className="flex flex-col items-center w-full">
+      {/* Top Status Badge (Professional Title) */}
+      <div className="font-display font-black text-xs tracking-widest text-blueprint-bg bg-blueprint-amber px-6 py-1.5 skew-x-[-15deg] mb-6 shadow-[0_0_15px_rgba(245,183,84,0.4)]">
+        <span className="skew-x-[15deg] block">
+          [{profileData.role.toUpperCase()}]
+        </span>
+      </div>
+
+      {/* Futuristic Professional Heading */}
+      <div className="relative mb-6 group cursor-default">
+        <h1 className="text-5xl md:text-7xl lg:text-9xl font-display font-black text-blueprint-teal italic leading-none tracking-tighter uppercase drop-shadow-[0_0_30px_rgba(94,234,212,0.6)] transition-all">
+          {profileData.role.split(" ")[0]}
+        </h1>
+        <h1 className="text-5xl md:text-7xl lg:text-9xl font-display font-black text-white italic -mt-5 md:-mt-8 lg:-mt-12 leading-none tracking-tighter uppercase drop-shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-all">
+          {profileData.role.split(" ").slice(1).join(" ")}
+        </h1>
+      </div>
+
+      {/* Subtitle / Professional Mission Statement */}
+      <p className="font-sans font-medium text-sm md:text-base text-blueprint-textSec max-w-xl mx-auto mb-10 bg-blueprint-bgSec/50 p-4 border-l-4 border-blueprint-teal backdrop-blur-sm">
+        "Fokus membangun solusi web fullstack end-to-end dari arsitektur backend
+        yang stabil hingga antarmuka frontend yang responsif, presisi, dan
+        intuitif."
+      </p>
+
+      {/* CTA Buttons */}
+      <div className="flex flex-col sm:flex-row gap-6 justify-center w-full max-w-md">
+        <a
+          href="#projects"
+          onClick={onScrollToProjects}
+          className="group relative flex-1 bg-blueprint-teal text-blueprint-bg font-display font-black text-sm px-8 py-4 skew-x-[-10deg] hover:bg-white transition-all shadow-[0_0_20px_rgba(94,234,212,0.4)] hover:shadow-[0_0_30px_rgba(255,255,255,0.6)] flex items-center justify-center"
+        >
+          <span className="skew-x-[10deg] flex items-center gap-2">
+            LIHAT PROYEK
+            <ExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </span>
+        </a>
+        <a
+          href="#contact"
+          onClick={onScrollToContact}
+          className="group relative flex-1 bg-blueprint-bgSec/80 backdrop-blur-sm text-blueprint-text border-2 border-blueprint-teal/40 font-display font-bold text-sm px-8 py-4 skew-x-[-10deg] hover:border-blueprint-teal hover:text-blueprint-teal hover:bg-blueprint-teal/10 transition-all flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)]"
+        >
+          <span className="skew-x-[10deg]">HUBUNGI SAYA</span>
+        </a>
+      </div>
+    </div>
   );
 }

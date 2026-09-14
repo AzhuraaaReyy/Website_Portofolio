@@ -90,7 +90,7 @@ export default function Lanyard({
     <div className="relative z-0 w-full h-screen flex justify-center items-center transform scale-100 origin-center">
       <Canvas
         camera={{ position, fov }}
-        dpr={[1, isMobile ? 1.5 : 2]}
+        dpr={[1, 1.5]}
         gl={{ alpha: transparent }}
         frameloop={frameloop}
         onCreated={({ gl }) =>

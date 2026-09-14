@@ -271,22 +271,34 @@ async function fetchRepoLanguagesProxy(username: string): Promise<RepoLanguages[
 export async function fetchReposWithLanguages(
   username: string,
 ): Promise<RepoLanguages[]> {
-  // Lapis 1 — proxy Vercel (utama, token server-side).
+  // Lapis 1 — proxy Vercel (utama, token server-side). Satu-satunya di produksi.
   const viaProxy = await fetchRepoLanguagesProxy(username);
   if (viaProxy) return viaProxy;
 
-  // Lapis 2 — GraphQL klien (VITE_GITHUB_TOKEN), token ter-bundle.
-  const clientToken = import.meta.env.VITE_GITHUB_TOKEN;
-  if (clientToken) {
-    try {
-      return await fetchRepoLanguagesGraphQl(username, clientToken);
-    } catch {
-      // token invalid/expired → jatuh ke lapis 3.
+  // Lapis 2 & 3 khusus DEVELOPMENT (npm run dev) — token VITE_* ter-bundle
+  // ke JS. Vite mengganti import.meta.env.DEV → false saat production build
+  // sehingga cabang ini (beserta referensi token) dibuang saat minify —
+  // token tidak pernah lolos ke bundle produksi.
+  if (import.meta.env.DEV) {
+    // Lapis 2 — GraphQL klien (VITE_GITHUB_TOKEN).
+    const clientToken = import.meta.env.VITE_GITHUB_TOKEN;
+    if (clientToken) {
+      try {
+        return await fetchRepoLanguagesGraphQl(username, clientToken);
+      } catch {
+        // token invalid/expired → jatuh ke lapis 3.
+      }
     }
+
+    // Lapis 3 — REST publik (tanpa token).
+    return fetchRepoLanguagesREST(username);
   }
 
-  // Lapis 3 — REST publik (tanpa token).
-  return fetchRepoLanguagesREST(username);
+  // Produksi: bila proxy gagal, tampilkan error jelas — jangan jatuh ke REST
+  // publik yang dibatasi rate-limit 60 request/jam (sumber pesan "limit").
+  throw new Error(
+    "Proxy leveling tidak merespons — coba lagi beberapa saat lagi",
+  );
 }
 
 // ---------- Helper ----------

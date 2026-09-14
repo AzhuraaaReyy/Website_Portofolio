@@ -18,15 +18,7 @@ import {
 import { AmbientBackground } from "./ui/AmbientBackground";
 import { ExpBar } from "./ui/ExpBar";
 import { useReducedMotion } from "../hooks/useReducedMotion";
-import type { LevelingSummary } from "../lib/levelingEngine";
-
-interface StatsProps {
-  summary: LevelingSummary | null;
-  loading: boolean;
-  error: string | null;
-  hasStaleData: boolean;
-  onRetry: () => void;
-}
+import { useGithubStatsContext } from "../context/GithubStatsContext";
 
 const DEVICON_SLUGS: Record<string, string> = {
   HTML: "html5",
@@ -59,13 +51,8 @@ function languageIcon(name: string) {
 
 const ITEMS_PER_PAGE = 10;
 
-export function Stats({
-  summary,
-  loading,
-  error,
-  hasStaleData,
-  onRetry,
-}: StatsProps) {
+export function Stats() {
+  const { summary, loading, error, retry } = useGithubStatsContext();
   const reducedMotion = useReducedMotion();
   const [langPage, setLangPage] = useState(0);
   const [projPage, setProjPage] = useState(0);
@@ -160,7 +147,7 @@ export function Stats({
           </p>
         </div>
 
-        {error && !hasStaleData ? (
+        {error ? (
           /* Error State - FPS Critical Alert Style */
           <motion.div
             variants={itemVariants}
@@ -180,7 +167,7 @@ export function Stats({
               {error}
             </p>
             <button
-              onClick={onRetry}
+              onClick={retry}
               className="inline-flex items-center gap-2 px-5 py-2.5 skew-x-[-10deg] bg-red-500 text-black font-display font-black text-xs uppercase tracking-widest hover:bg-white transition-all shadow-lg hover:shadow-red-500/50"
             >
               <RefreshCw className="w-4 h-4 skew-x-[10deg]" />
@@ -195,26 +182,6 @@ export function Stats({
             viewport={{ once: true, amount: 0.15 }}
             className="space-y-8"
           >
-            {hasStaleData ? (
-              <motion.div
-                variants={itemVariants}
-                className="border border-blueprint-amber/50 bg-blueprint-amber/10 p-4 flex flex-col sm:flex-row sm:items-center gap-3 relative"
-              >
-                <ShieldOff className="w-5 h-5 text-blueprint-amber shrink-0" />
-                <p className="font-mono text-xs text-blueprint-amber tracking-wider flex-1">
-                  Peringatan Sistem: Data yang ditampilkan adalah versi cache
-                  terkini ({error}).
-                </p>
-                <button
-                  onClick={onRetry}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 skew-x-[-10deg] bg-blueprint-amber text-blueprint-bg font-display font-bold text-[10px] uppercase tracking-widest hover:bg-white transition-colors"
-                >
-                  <RefreshCw className="w-3.5 h-3.5 skew-x-[10deg]" />
-                  <span className="skew-x-[10deg]">SINKRONISASI ULANG</span>
-                </button>
-              </motion.div>
-            ) : null}
-
             {/* Level & EXP Card - FPS HUD Command Center */}
             <motion.div
               variants={itemVariants}
@@ -240,8 +207,10 @@ export function Stats({
                         {summary?.level ?? 1}
                       </div>
                     )}
-                    <span className="font-mono text-[9px] bg-blueprint-teal/10 text-blueprint-teal border border-blueprint-teal/30 px-2 py-0.5 mt-2 inline-block font-bold">
-                      RANK: DEV_ELITE
+                    <span className="font-mono text-[9px] bg-blueprint-teal/10 text-blueprint-teal border border-blueprint-teal/30 px-2 py-0.5 mt-2 inline-block font-bold uppercase truncate max-w-[15rem] sm:max-w-[17rem]">
+                      RANK:{" "}
+                      {summary?.tier.title ??
+                        (loading ? "MENUNGGU DATA" : "OFFLINE")}
                     </span>
                   </div>
 
@@ -409,6 +378,7 @@ export function Stats({
                                 <img
                                   src={icon}
                                   alt={lang.name}
+                                  loading="lazy"
                                   className="w-5 h-5 shrink-0 filter drop-shadow"
                                 />
                               ) : (

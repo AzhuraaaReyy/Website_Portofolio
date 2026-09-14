@@ -1,14 +1,10 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Gamepad2, Wifi, RefreshCw } from "lucide-react";
 import { useReducedMotion } from "../hooks/useReducedMotion";
-import type { LevelingSummary } from "../lib/levelingEngine";
+import { useGithubStatsContext } from "../context/GithubStatsContext";
 
 interface NavbarProps {
   activeSection?: string;
-  summary?: LevelingSummary | null;
-  loading?: boolean;
-  error?: boolean;
-  onRetry?: () => void;
 }
 
 function PingStatus() {
@@ -47,16 +43,14 @@ function PingStatus() {
 
 export function Navbar({
   activeSection: activeSectionProp,
-  summary,
-  loading = false,
-  error = false,
-  onRetry,
 }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [currentActive, setCurrentActive] = useState(
     activeSectionProp || "home"
   );
+  const { summary, loading, error, retry } = useGithubStatsContext();
+  const hasError = error !== null;
 
   const navLinks = [
     { label: "BERANDA", href: "#home" },
@@ -106,7 +100,7 @@ export function Navbar({
     if (targetElement) {
       const offset = 80;
       const elementPosition = targetElement.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      const offsetPosition = elementPosition + window.scrollY - offset;
 
       window.scrollTo({
         top: offsetPosition,
@@ -155,7 +149,7 @@ export function Navbar({
                     <span className="w-5 h-4 animate-pulse bg-blueprint-teal/20 inline-block" />
                   ) : (
                     <span className="font-display font-black text-blueprint-teal">
-                      {error ? "--" : summary?.level ?? 1}
+                      {hasError ? "--" : summary?.level ?? 1}
                     </span>
                   )}
                 </div>
@@ -164,20 +158,27 @@ export function Navbar({
                 <div className="w-12 sm:w-16 h-1.5 bg-blueprint-bg border border-blueprint-teal/40 p-[1px] relative overflow-hidden">
                   <div
                     className="h-full bg-blueprint-teal transition-all duration-500 shadow-[0_0_8px_#5EEAD4]"
-                    style={{ width: `${error ? 0 : progressPercent}%` }}
+                    style={{ width: `${hasError ? 0 : progressPercent}%` }}
                   />
                 </div>
 
                 <div className="flex items-center gap-1">
                   <span className="text-blueprint-textSec">RANK</span>
-                  <span className="font-display font-black text-blueprint-amber">
-                    {error ? "OFFLINE" : "RIZAL"}
+                  <span className="font-display font-black text-blueprint-amber uppercase truncate max-w-[9rem] hidden md:inline-block">
+                    {hasError
+                      ? "OFFLINE"
+                      : summary?.tier.title ?? "MENUNGGU DATA"}
+                  </span>
+                  <span className="font-display font-black text-blueprint-amber uppercase truncate max-w-[7rem] md:hidden">
+                    {hasError
+                      ? "OFFLINE"
+                      : summary?.tier.title ?? "MENUNGGU DATA"}
                   </span>
                 </div>
 
-                {error && onRetry && (
+                {hasError && retry && (
                   <button
-                    onClick={onRetry}
+                    onClick={retry}
                     aria-label="Coba lagi sinkronisasi level"
                     className="flex items-center gap-1 text-blueprint-amber hover:text-white transition-colors cursor-pointer"
                   >
@@ -258,15 +259,17 @@ export function Navbar({
                   <strong className="w-5 h-4 animate-pulse bg-blueprint-teal/20 inline-block align-middle" />
                 ) : (
                   <strong className="text-blueprint-teal font-black">
-                    {error ? "--" : summary?.level ?? 1}
+                    {hasError ? "--" : summary?.level ?? 1}
                   </strong>
                 )}
               </span>
               <span className="text-blueprint-teal/30">|</span>
               <span className="text-blueprint-textSec">
                 RANK{" "}
-                <strong className="text-blueprint-amber font-black">
-                  {error ? "OFFLINE" : "RIZAL"}
+                <strong className="text-blueprint-amber font-black uppercase">
+                  {hasError
+                    ? "OFFLINE"
+                    : summary?.tier.title ?? "MENUNGGU DATA"}
                 </strong>
               </span>
               <span className="text-blueprint-teal/30">|</span>

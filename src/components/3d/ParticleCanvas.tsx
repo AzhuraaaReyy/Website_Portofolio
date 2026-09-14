@@ -67,6 +67,7 @@ export function ParticleCanvas({ scrollProgress, frameloop = "always" }: Particl
       <Canvas
         camera={{ position: [0, 0, 5.5], fov: 60 }}
         gl={{ antialias: true, alpha: true }}
+        dpr={[1, 1.5]}
         frameloop={frameloop}
       >
         <ambientLight intensity={0.5} />

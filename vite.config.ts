@@ -17,11 +17,6 @@ export default defineConfig({
               priority: 30,
             },
             {
-              name: 'three-vendor',
-              test: /node_modules[\\/](three|@react-three|meshline)/,
-              priority: 20,
-            },
-            {
               name: 'gsap-vendor',
               test: /node_modules[\\/]gsap/,
               priority: 15,
@@ -35,12 +30,6 @@ export default defineConfig({
               name: 'icons-vendor',
               test: /node_modules[\\/](react-icons|lucide-react|@phosphor-icons)/,
               priority: 12,
-            },
-            {
-              name: 'common',
-              minShareCount: 2,
-              minSize: 15000,
-              priority: 5,
             },
           ],
         },
