@@ -5,6 +5,7 @@ on:
     - cron: "0 2 * * *"
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -23,7 +24,7 @@ jobs:
 
       - name: Fetch GitHub stats
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GITHUB_OWNER: ${{ github.repository_owner }}
         run: node scripts/fetch-github-stats.mjs
 
