@@ -1,6 +1,8 @@
 import {
+  COMPLETION_KEYWORDS,
   LEVELING_CONFIG,
   LEVELING_TIERS,
+  TECH_PATTERNS,
   type Tier,
 } from "../data/levelingConfig";
 
@@ -11,6 +13,8 @@ export type LanguageCategory = "utama" | "programming" | "markup" | "unknown";
 export interface RepoStat {
   name: string;
   languages: string[];
+  stack: string[];
+  completed: boolean;
   exp: number;
 }
 
@@ -18,6 +22,12 @@ export interface LanguageStat {
   name: string;
   category: LanguageCategory;
   expPerProject: number;
+  usedInRepos: number;
+  totalExp: number;
+}
+
+export interface TechStat {
+  name: string;
   usedInRepos: number;
   totalExp: number;
 }
@@ -30,8 +40,30 @@ export interface LevelingSummary {
   progress: number;
   totalExp: number;
   totalRepos: number;
+  completedRepos: number;
+  technologyCount: number;
+  languageCount: number;
   languageBreakdown: LanguageStat[];
+  technologyBreakdown: TechStat[];
   projectBreakdown: RepoStat[];
+}
+
+export function detectCompleted(commitMessages: string[]): boolean {
+  return commitMessages.some((message) =>
+    COMPLETION_KEYWORDS.some((keyword) =>
+      message.toLowerCase().includes(keyword),
+    ),
+  );
+}
+
+export function extractTechStack(manifests: Record<string, string>): string[] {
+  const raw = Object.values(manifests).join("\n").toLowerCase();
+  if (!raw) return [];
+  const found = new Set<string>();
+  for (const pattern of TECH_PATTERNS) {
+    if (raw.includes(pattern.match)) found.add(pattern.label);
+  }
+  return [...found].sort();
 }
 
 export function classifyLanguage(name: string): LanguageCategory {
@@ -130,7 +162,10 @@ export function progressFromExp(totalExp: number): {
 }
 
 export function summarize(repoStats: RepoStat[]): LevelingSummary {
-  const totalExp = repoStats.reduce((sum, r) => sum + r.exp, 0);
+  const totalExp = repoStats.reduce(
+    (sum, r) => sum + (Number.isFinite(r.exp) ? r.exp : 0),
+    0,
+  );
   const { level, currentExp, requiredExp, progress } = progressFromExp(totalExp);
   const tier = tierFromLevel(level);
 
@@ -161,6 +196,34 @@ export function summarize(repoStats: RepoStat[]): LevelingSummary {
 
   const projectBreakdown = [...repoStats].sort((a, b) => b.exp - a.exp);
 
+  const completedRepos = repoStats.filter((repo) => repo.completed).length;
+  const technologySet = new Set<string>();
+  const techMap = new Map<
+    string,
+    { usedInRepos: number; totalExp: number }
+  >();
+  for (const repo of repoStats) {
+    // Dedup per repo (cermin languageBreakdown) agar usedInRepos = jumlah repo.
+    for (const tech of new Set(repo.stack)) {
+      technologySet.add(tech);
+      const found = techMap.get(tech);
+      if (found) {
+        found.usedInRepos += 1;
+        found.totalExp += Number.isFinite(repo.exp) ? repo.exp : 0;
+      } else {
+        techMap.set(tech, {
+          usedInRepos: 1,
+          totalExp: Number.isFinite(repo.exp) ? repo.exp : 0,
+        });
+      }
+    }
+  }
+  const technologyCount = technologySet.size;
+  const technologyBreakdown: TechStat[] = [...techMap.entries()]
+    .map(([name, stat]) => ({ name, ...stat }))
+    .sort((a, b) => b.usedInRepos - a.usedInRepos || b.totalExp - a.totalExp);
+  const languageCount = languageBreakdown.length;
+
   return {
     level,
     tier,
@@ -169,7 +232,11 @@ export function summarize(repoStats: RepoStat[]): LevelingSummary {
     progress,
     totalExp,
     totalRepos: repoStats.length,
+    completedRepos,
+    technologyCount,
+    languageCount,
     languageBreakdown,
+    technologyBreakdown,
     projectBreakdown,
   };
 }

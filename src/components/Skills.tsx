@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { GlitchHeading } from "./ui/GlitchHeading";
 import {
   Cpu,
   Layers,
@@ -55,6 +56,7 @@ import {
   type SkillCategory,
 } from "../data/portfolioData";
 import { useReducedMotion } from "../hooks/useReducedMotion";
+import { useGsapReveal } from "../hooks/useGsapReveal";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { AmbientBackground } from "./ui/AmbientBackground";
@@ -315,6 +317,7 @@ const SkillCategoryCard = ({
 // --- KOMPONEN UTAMA ---
 export function Skills() {
   const reducedMotion = useReducedMotion();
+  const gsapRevealRef = useGsapReveal<HTMLElement>();
 
   const allSkills = skillsData.flatMap((category) => category.skills);
   const totalSkills = allSkills.length;
@@ -352,11 +355,10 @@ export function Skills() {
     },
   };
 
-  const steps = (n: number) => (t: number) => Math.floor(t * n) / n;
-
   return (
     <section
       id="skills"
+      ref={gsapRevealRef}
       className="py-24 bg-blueprint-bg relative section-scroll overflow-hidden border-t border-blueprint-teal/20 select-none font-mono"
     >
       <AmbientBackground
@@ -374,67 +376,15 @@ export function Skills() {
       <div className="absolute inset-0 z-0 bg-blueprint-bg/90 backdrop-blur-[1px] blueprint-grid bg-grid-size opacity-20 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="mb-12 flex flex-col items-start gap-5 text-left">
+        <div className="mb-12 flex flex-col items-start gap-5 text-left" data-gsap-reveal>
           <div className="font-bold text-xs tracking-widest text-blueprint-teal px-3 py-1 bg-blueprint-teal/10 border-l-4 border-blueprint-teal inline-flex items-center gap-2">
             <Target className="w-3.5 h-3.5 text-blueprint-amber animate-spin-slow" />
             PROFIL_TEKNIS // TECHNICAL_STACK
           </div>
 
-          <div className="relative inline-block group cursor-default select-none">
-            {/* LAYER GLITCH 1: CYAN / TEAL */}
-            <motion.h2
-              aria-hidden="true"
-              animate={{
-                x: [-2, 4, -3, 2, 0],
-                y: [0, -1, 1, 0],
-                opacity: [0.8, 0.2, 0.9, 0.3, 0.8],
-                skewX: [-5, -8, -3, -6, -5],
-              }}
-              transition={{
-                duration: 0.6,
-                repeat: Infinity,
-                repeatType: "mirror",
-                ease: steps(3),
-              }}
-              className="absolute inset-0 text-4xl md:text-5xl lg:text-6xl font-black font-display text-cyan-400 tracking-tighter pointer-events-none uppercase italic z-0 mix-blend-screen"
-              style={{
-                clipPath: "polygon(0 0, 100% 0, 100% 45%, 0 45%)",
-                filter: "drop-shadow(-2px 0px 2px rgba(6,182,212,0.8))",
-              }}
-            >
-              KAPABILITAS TEKNIS
-            </motion.h2>
-
-            {/* LAYER GLITCH 2: ROSE / MAGENTA */}
-            <motion.h2
-              aria-hidden="true"
-              animate={{
-                x: [3, -3, 4, -2, 0],
-                y: [0, 1, -1, 0],
-                opacity: [0.9, 0.3, 0.8, 0.2, 0.9],
-                skewX: [-5, -2, -7, -4, -5],
-              }}
-              transition={{
-                duration: 0.45,
-                repeat: Infinity,
-                repeatType: "mirror",
-                ease: steps(2),
-                delay: 0.05,
-              }}
-              className="absolute inset-0 text-4xl md:text-5xl lg:text-6xl font-black font-display text-rose-500 tracking-tighter pointer-events-none uppercase italic z-0 mix-blend-screen"
-              style={{
-                clipPath: "polygon(0 50%, 100% 50%, 100% 100%, 0 100%)",
-                filter: "drop-shadow(2px 0px 2px rgba(244,63,94,0.8))",
-              }}
-            >
-              KAPABILITAS TEKNIS
-            </motion.h2>
-
-            {/* TEKS UTAMA */}
-            <h2 className="relative text-4xl md:text-5xl lg:text-6xl font-black font-display text-blueprint-text tracking-tighter drop-shadow-[0_0_20px_rgba(94,234,212,0.4)] hover:text-blueprint-teal transition-colors duration-300 uppercase italic skew-x-[-5deg] z-10">
-              KAPABILITAS TEKNIS
-            </h2>
-          </div>
+          <GlitchHeading text="KAPABILITAS TEKNIS" className="group cursor-default select-none">
+            KAPABILITAS TEKNIS
+          </GlitchHeading>
 
           <div className="w-full flex flex-col lg:flex-row items-start justify-between gap-6 pt-4 border-t border-blueprint-teal/15">
             <p className="flex-1 text-justify text-xs sm:text-sm text-slate-300 w-full text-justify leading-relaxed border-l-2 border-blueprint-teal/40 pl-3 mt-2">

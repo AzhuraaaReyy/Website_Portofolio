@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Variants } from "framer-motion";
+import { GlitchHeading } from "./ui/GlitchHeading";
 import {
   Briefcase,
   GraduationCap,
@@ -13,6 +14,7 @@ import {
 } from "lucide-react";
 import { timelineData } from "../data/portfolioData";
 import { useReducedMotion } from "../hooks/useReducedMotion";
+import { useGsapReveal } from "../hooks/useGsapReveal";
 import { AmbientBackground } from "./ui/AmbientBackground";
 
 // ==================== HELPER COMPONENT: REALISTIC ELECTRIC ARC BORDER ====================
@@ -122,9 +124,8 @@ function ElectricBorder({ color, isActive }: ElectricBorderProps) {
 
 export function Experience() {
   const reducedMotion = useReducedMotion();
+  const gsapRevealRef = useGsapReveal<HTMLElement>();
   const [activeFilter, setActiveFilter] = useState<string>("SEMUA");
-
-  const steps = (n: number) => (t: number) => Math.floor(t * n) / n;
 
   const filterCategories = [
     { key: "SEMUA", label: "Semua Riwayat" },
@@ -167,6 +168,7 @@ export function Experience() {
   return (
     <section
       id="experience"
+      ref={gsapRevealRef}
       className="py-24 bg-blueprint-bg relative section-scroll border-t border-blueprint-teal/20 overflow-hidden font-mono select-none"
     >
       <AmbientBackground
@@ -181,64 +183,16 @@ export function Experience() {
 
       <div className="max-w-5xl mx-auto px-6 relative z-10">
         {/* ==================== SECTION HEADER ==================== */}
-        <div className="mb-10 flex flex-col items-start gap-3 shrink-0">
+        <div className="mb-10 flex flex-col items-start gap-3 shrink-0" data-gsap-reveal>
           <div className="font-bold text-xs tracking-widest text-blueprint-teal px-3 py-1 bg-blueprint-teal/10 border-l-4 border-blueprint-teal inline-flex items-center gap-2">
             <BookOpen className="w-3.5 h-3.5 text-blueprint-amber animate-pulse" />
             REKAPITULASI_KARIR // RIWAYAT_AKADEMIK
           </div>
 
-          <div className="relative inline-block group cursor-default">
-            <motion.h2
-              aria-hidden="true"
-              animate={{
-                x: [-2, 4, -3, 2, 0],
-                y: [0, -1, 1, 0],
-                opacity: [0.8, 0.2, 0.9, 0.3, 0.8],
-                skewX: [-5, -8, -3, -6, -5],
-              }}
-              transition={{
-                duration: 0.6,
-                repeat: Infinity,
-                repeatType: "mirror",
-                ease: steps(3),
-              }}
-              className="absolute inset-0 text-4xl md:text-5xl lg:text-6xl font-black font-display text-cyan-400 tracking-tighter pointer-events-none uppercase italic z-0 mix-blend-screen whitespace-nowrap"
-              style={{
-                clipPath: "polygon(0 0, 100% 0, 100% 45%, 0 45%)",
-                filter: "drop-shadow(-2px 0px 2px rgba(6,182,212,0.8))",
-              }}
-            >
-              PENGALAMAN & PENDIDIKAN
-            </motion.h2>
-
-            <motion.h2
-              aria-hidden="true"
-              animate={{
-                x: [3, -3, 4, -2, 0],
-                y: [0, 1, -1, 0],
-                opacity: [0.9, 0.3, 0.8, 0.2, 0.9],
-                skewX: [-5, -2, -7, -4, -5],
-              }}
-              transition={{
-                duration: 0.45,
-                repeat: Infinity,
-                repeatType: "mirror",
-                ease: steps(2),
-                delay: 0.05,
-              }}
-              className="absolute inset-0 text-4xl md:text-5xl lg:text-6xl font-black font-display text-rose-500 tracking-tighter pointer-events-none uppercase italic z-0 mix-blend-screen whitespace-nowrap"
-              style={{
-                clipPath: "polygon(0 50%, 100% 50%, 100% 100%, 0 100%)",
-                filter: "drop-shadow(2px 0px 2px rgba(244,63,94,0.8))",
-              }}
-            >
-              PENGALAMAN & PENDIDIKAN
-            </motion.h2>
-
-            <h2 className="relative text-4xl md:text-5xl lg:text-6xl font-black font-display text-blueprint-text tracking-tighter drop-shadow-[0_0_20px_rgba(94,234,212,0.4)] hover:text-blueprint-teal transition-colors duration-300 uppercase italic skew-x-[-5deg] z-10 whitespace-nowrap">
-              PENGALAMAN <span className="">& PENDIDIKAN</span>
-            </h2>
-          </div>
+          <GlitchHeading text="PENGALAMAN & PENDIDIKAN" nowrap className="group cursor-default">
+            PENGALAMAN{" "}
+            <span className="">& PENDIDIKAN</span>
+          </GlitchHeading>
 
           <p className="text-xs sm:text-sm text-slate-300 w-full leading-relaxed border-l-2 border-blueprint-teal/40 pl-3 mt-1">
             Rangkuman perjalanan karier, proyek teknis, dan latar belakang
@@ -248,7 +202,7 @@ export function Experience() {
         </div>
 
         {/* ==================== FILTER TAB & COUNTER HUD ==================== */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-12">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-12" data-gsap-reveal>
           <div className="flex overflow-x-auto gap-2 pb-1 sm:pb-0 hide-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <div className="flex bg-blueprint-bgSec/80 p-1 border border-blueprint-teal/20 backdrop-blur-md skew-x-[-8deg]">
               {filterCategories.map((cat) => {

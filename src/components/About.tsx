@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, lazy, Suspense } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 
+import { GlitchHeading } from "./ui/GlitchHeading";
+
 const Lanyard = lazy(() => import("./Lanyard"));
 import {
   Crosshair,
@@ -31,6 +33,7 @@ import {
 } from "../data/portfolioData";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 import { useTabVisible } from "../hooks/useTabVisible";
+import { useGsapReveal } from "../hooks/useGsapReveal";
 import { AmbientBackground } from "./ui/AmbientBackground";
 import { GithubIcon, LinkedinIcon } from "./ui/SocialIcons";
 
@@ -441,6 +444,7 @@ function OverviewLanyard({
   const [nearViewport, setNearViewport] = useState(false);
   const [visible, setVisible] = useState(false);
   const tabVisible = useTabVisible();
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -490,7 +494,11 @@ function OverviewLanyard({
             backImage={backImage}
             imageFit="cover"
             lanyardWidth={1.5}
-            frameloop={visible && tabVisible ? "always" : "never"}
+            frameloop={
+              reducedMotion
+                ? visible && tabVisible ? "demand" : "never"
+                : visible && tabVisible ? "always" : "never"
+            }
           />
         </Suspense>
       ) : (
@@ -549,16 +557,17 @@ export function About() {
   };
 
   const prevIndex = useRef(activeIndex);
+  const gsapRevealRef = useGsapReveal<HTMLElement>();
   const slideDir = (): number => {
     const dir = activeIndex >= prevIndex.current ? 1 : -1;
     prevIndex.current = activeIndex;
     return dir;
   };
-  const steps = (n: number) => (t: number) => Math.floor(t * n) / n;
 
   return (
     <section
       id="about"
+      ref={gsapRevealRef}
       className="relative min-h-screen h-auto flex flex-col justify-between border-t border-blueprint-teal/20 bg-blueprint-bg font-mono"
     >
       <AmbientBackground
@@ -568,7 +577,7 @@ export function About() {
       />
       <div className="absolute inset-0 bg-blueprint-grid bg-grid-size opacity-20 pointer-events-none mix-blend-screen" />
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 flex-1 flex flex-col justify-between pt-20 pb-12">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 flex-1 flex flex-col justify-between pt-20 pb-12" data-gsap-reveal>
         {/* ================= SECTION HEADER ================= */}
         {/* ================= SECTION HEADER ================= */}
         <div className="mb-6 flex flex-col items-start gap-3 shrink-0">
@@ -580,64 +589,15 @@ export function About() {
 
           {/* 2. Judul Utama (PROFILE TENTANG SAYA) */}
           <div className="flex flex-col md:flex-row md:items-end md:justify-between w-full gap-4">
-            <div className="relative inline-block group cursor-default select-none">
-              {/* LAYER GLITCH 1: CYAN / TEAL */}
-              <motion.h2
-                aria-hidden="true"
-                animate={{
-                  x: [-2, 4, -3, 2, 0],
-                  y: [0, -1, 1, 0],
-                  opacity: [0.8, 0.2, 0.9, 0.3, 0.8],
-                  skewX: [-5, -8, -3, -6, -5],
-                }}
-                transition={{
-                  duration: 0.6,
-                  repeat: Infinity,
-                  repeatType: "mirror",
-                  ease: steps(3),
-                }}
-                className="absolute inset-0 text-4xl md:text-5xl lg:text-6xl font-black font-display text-cyan-400 tracking-tighter pointer-events-none uppercase italic z-0 mix-blend-screen"
-                style={{
-                  clipPath: "polygon(0 0, 100% 0, 100% 45%, 0 45%)",
-                  filter: "drop-shadow(-2px 0px 2px rgba(6,182,212,0.8))",
-                }}
+              <GlitchHeading
+                text={`PROFILE ${active.label.toUpperCase()}`}
+                className="group cursor-default select-none"
               >
-                PROFILE <span>{active.label.toUpperCase()}</span>
-              </motion.h2>
-
-              {/* LAYER GLITCH 2: ROSE / MAGENTA */}
-              <motion.h2
-                aria-hidden="true"
-                animate={{
-                  x: [3, -3, 4, -2, 0],
-                  y: [0, 1, -1, 0],
-                  opacity: [0.9, 0.3, 0.8, 0.2, 0.9],
-                  skewX: [-5, -2, -7, -4, -5],
-                }}
-                transition={{
-                  duration: 0.45,
-                  repeat: Infinity,
-                  repeatType: "mirror",
-                  ease: steps(2),
-                  delay: 0.05,
-                }}
-                className="absolute inset-0 text-4xl md:text-5xl lg:text-6xl font-black font-display text-rose-500 tracking-tighter pointer-events-none uppercase italic z-0 mix-blend-screen"
-                style={{
-                  clipPath: "polygon(0 50%, 100% 50%, 100% 100%, 0 100%)",
-                  filter: "drop-shadow(2px 0px 2px rgba(244,63,94,0.8))",
-                }}
-              >
-                PROFILE <span>{active.label.toUpperCase()}</span>
-              </motion.h2>
-
-              {/* TEKS UTAMA */}
-              <h2 className="relative text-4xl md:text-5xl lg:text-6xl font-black font-display text-blueprint-text tracking-tighter drop-shadow-[0_0_20px_rgba(94,234,212,0.4)] hover:text-blueprint-teal transition-colors duration-300 uppercase italic skew-x-[-5deg] z-10">
                 PROFILE{" "}
                 <span className={accent.text}>
                   {active.label.toUpperCase()}
                 </span>
-              </h2>
-            </div>
+              </GlitchHeading>
 
             {/* Counter Display (Misal: 01/05) */}
             <div className="flex items-center gap-2 text-[10px] text-slate-300 self-start md:self-end">

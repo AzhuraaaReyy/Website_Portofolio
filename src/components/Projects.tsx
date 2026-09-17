@@ -12,7 +12,9 @@ import type { Variants } from "framer-motion";
 import type { Project } from "../data/portfolioData";
 import { projectsData } from "../data/portfolioData";
 import { ProjectCard } from "./ProjectCard";
+import { GlitchHeading } from "./ui/GlitchHeading";
 import { useReducedMotion } from "../hooks/useReducedMotion";
+import { useGsapReveal } from "../hooks/useGsapReveal";
 import { AmbientBackground } from "./ui/AmbientBackground";
 import { GithubIcon } from "./ui/SocialIcons";
 
@@ -20,6 +22,7 @@ export function Projects() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("SEMUA_PROYEK");
   const reducedMotion = useReducedMotion();
+  const gsapRevealRef = useGsapReveal<HTMLElement>();
 
   const filterCategories = [
     { key: "SEMUA_PROYEK", label: "Semua Proyek" },
@@ -65,8 +68,6 @@ export function Projects() {
   const totalMissions = projectsData.length;
   const priorityCount = projectsData.filter((p) => p.featured).length;
 
-  const steps = (n: number) => (t: number) => Math.floor(t * n) / n;
-
   // Framer Motion Animation Settings
   const containerVariants: Variants = {
     hidden: {},
@@ -89,20 +90,23 @@ export function Projects() {
   return (
     <section
       id="projects"
+      ref={gsapRevealRef}
       className="py-24 bg-blueprint-bg relative section-scroll border-t border-blueprint-teal/20 overflow-hidden font-mono select-none"
     >
       <AmbientBackground
-        glowIntensity={0.2}
-        parallaxSpeed={0.8}
-        circuitVariant={3}
+        glowIntensity={0.18}
+        parallaxSpeed={0.3}
+        circuitVariant={2}
       />
 
       <div className="absolute inset-0 z-0 bg-blueprint-bg/85 backdrop-blur-[1px] blueprint-grid bg-grid-size opacity-30 mix-blend-screen pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Section Header */}
-        {/* Section Header */}
-        <div className="mb-8 flex flex-col items-start gap-3 shrink-0">
+        <div
+          className="mb-8 flex flex-col items-start gap-3 shrink-0"
+          data-gsap-reveal
+        >
           {/* Tag Top Badge */}
           <div className="font-bold text-xs tracking-widest text-blueprint-teal px-3 py-1 bg-blueprint-teal/10 border-l-4 border-blueprint-teal inline-flex items-center gap-2">
             <Target className="w-3.5 h-3.5 text-blueprint-amber animate-spin-slow" />
@@ -110,58 +114,13 @@ export function Projects() {
           </div>
 
           {/* Judul Utama */}
-          <div className="relative inline-block group cursor-default">
-            <motion.h2
-              aria-hidden="true"
-              animate={{
-                x: [-2, 4, -3, 2, 0],
-                y: [0, -1, 1, 0],
-                opacity: [0.8, 0.2, 0.9, 0.3, 0.8],
-                skewX: [-5, -8, -3, -6, -5],
-              }}
-              transition={{
-                duration: 0.6,
-                repeat: Infinity,
-                repeatType: "mirror",
-                ease: steps(3),
-              }}
-              className="absolute inset-0 text-4xl md:text-5xl lg:text-6xl font-black font-display text-cyan-400 tracking-tighter pointer-events-none uppercase italic z-0 mix-blend-screen whitespace-nowrap"
-              style={{
-                clipPath: "polygon(0 0, 100% 0, 100% 45%, 0 45%)",
-                filter: "drop-shadow(-2px 0px 2px rgba(6,182,212,0.8))",
-              }}
-            >
-              PORTOFOLIO PROYEK
-            </motion.h2>
-
-            <motion.h2
-              aria-hidden="true"
-              animate={{
-                x: [3, -3, 4, -2, 0],
-                y: [0, 1, -1, 0],
-                opacity: [0.9, 0.3, 0.8, 0.2, 0.9],
-                skewX: [-5, -2, -7, -4, -5],
-              }}
-              transition={{
-                duration: 0.45,
-                repeat: Infinity,
-                repeatType: "mirror",
-                ease: steps(2),
-                delay: 0.05,
-              }}
-              className="absolute inset-0 text-4xl md:text-5xl lg:text-6xl font-black font-display text-rose-500 tracking-tighter pointer-events-none uppercase italic z-0 mix-blend-screen whitespace-nowrap"
-              style={{
-                clipPath: "polygon(0 50%, 100% 50%, 100% 100%, 0 100%)",
-                filter: "drop-shadow(2px 0px 2px rgba(244,63,94,0.8))",
-              }}
-            >
-              PORTOFOLIO PROYEK
-            </motion.h2>
-
-            <h2 className="relative text-4xl md:text-5xl lg:text-6xl font-black font-display text-blueprint-text tracking-tighter drop-shadow-[0_0_20px_rgba(94,234,212,0.4)] hover:text-blueprint-teal transition-colors duration-300 uppercase italic skew-x-[-5deg] z-10 whitespace-nowrap">
-              PORTOFOLIO <span className="text-blueprint-teal">PROYEK</span>
-            </h2>
-          </div>
+          <GlitchHeading
+            text="PORTOFOLIO PROYEK"
+            nowrap
+            className="group cursor-default"
+          >
+            PORTOFOLIO <span className="text-blueprint-teal">PROYEK</span>
+          </GlitchHeading>
 
           {/* Deskripsi Membentang Penuh */}
           <p className="text-xs sm:text-sm text-slate-300 w-full leading-relaxed border-l-2 border-blueprint-teal/40 pl-3 mt-1">
@@ -173,7 +132,10 @@ export function Projects() {
         </div>
 
         {/* Area Tab Filter & Counter Statistik (Sebaris) */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
+        <div
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10"
+          data-gsap-reveal
+        >
           {/* Tab Filter (Sebelah Kiri) */}
           <div className="flex overflow-x-auto gap-2 pb-1 sm:pb-0 hide-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <div className="flex bg-blueprint-bgSec/80 p-1 border border-blueprint-teal/20 backdrop-blur-md skew-x-[-8deg]">

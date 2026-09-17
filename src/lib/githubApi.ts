@@ -2,6 +2,13 @@ const API_BASE = "https://api.github.com";
 const GRAPHQL_ENDPOINT = "https://api.github.com/graphql";
 const MAX_ATTEMPTS = 3;
 
+// PAT asli GitHub: ghp_ (classic) atau github_pat_ (fine-grained) jauh lebih panjang dari 30 char.
+const PLACEHOLDER_PATTERN = /placeholder|YOUR[_ -]?TOKEN|>|<|^\s*$/i;
+
+function isPlaceholderToken(token: string): boolean {
+  return token.length < 31 || PLACEHOLDER_PATTERN.test(token);
+}
+
 export interface GitHubRepo {
   name: string;
 }
@@ -9,6 +16,8 @@ export interface GitHubRepo {
 export interface RepoLanguages {
   name: string;
   languages: string[];
+  commitMessages: string[];
+  manifests: Record<string, string>;
 }
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -57,19 +66,26 @@ async function fetchWithRetry(
   throw new Error("fetchWithRetry: retry berhenti tak terduga");
 }
 
-async function githubFetch(path: string): Promise<Response> {
+async function githubFetch(path: string, token?: string): Promise<Response> {
   const headers: Record<string, string> = {
     Accept: "application/vnd.github+json",
   };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
   return fetchWithRetry(`${API_BASE}${path}`, { headers });
 }
 
 /**
  * GET /users/{username}/repos — lapis REST publik (tanpa token).
  */
-export async function fetchRepos(username: string): Promise<GitHubRepo[]> {
+export async function fetchRepos(
+  username: string,
+  token?: string,
+): Promise<GitHubRepo[]> {
   const res = await githubFetch(
     `/users/${encodeURIComponent(username)}/repos?per_page=100&type=all`,
+    token,
   );
   if (!res.ok) {
     throw new Error(await errorMessage(res, "repos"));
@@ -89,9 +105,11 @@ export async function fetchRepos(username: string): Promise<GitHubRepo[]> {
 export async function fetchRepoLanguages(
   username: string,
   repo: string,
+  token?: string,
 ): Promise<string[]> {
   const res = await githubFetch(
     `/repos/${encodeURIComponent(username)}/${encodeURIComponent(repo)}/languages`,
+    token,
   );
   if (!res.ok) {
     throw new Error(await errorMessage(res, `languages:${repo}`));
@@ -101,16 +119,73 @@ export async function fetchRepoLanguages(
 }
 
 /**
- * Lapis 3: REST publik, repos + languages per repo, dibatasi konkurensi.
+ * GET /repos/{username}/{repo}/commits — lapis REST publik.
+ * Ambil 30 pesan komit terakhir (messageHeadline) untuk deteksi "selesai".
+ * Gagal (mis. repo kosong) → dikembalikan sebagai []; tidak fatal.
  */
-async function fetchRepoLanguagesREST(username: string): Promise<RepoLanguages[]> {
-  const repos = await fetchRepos(username);
+export async function fetchRepoCommits(
+  username: string,
+  repo: string,
+  token?: string,
+): Promise<string[]> {
+  const res = await githubFetch(
+    `/repos/${encodeURIComponent(username)}/${encodeURIComponent(repo)}/commits?per_page=30`,
+    token,
+  );
+  if (!res.ok) return [];
+  const data: Array<{ commit: { message: string } }> = await res.json();
+  return data
+    .map((entry) => entry.commit.message.split("\n")[0].trim())
+    .filter((line) => line.length > 0);
+}
+
+/**
+ * GET /repos/{username}/{repo}/contents/{file} — lapis REST publik.
+ * Ambil isi file manifest proyek (package.json / composer.json / pubspec.yaml)
+ * untuk deteksi tech stack. File tidak ada (404) → dilewati, tidak fatal.
+ */
+export async function fetchRepoManifests(
+  username: string,
+  repo: string,
+  token?: string,
+): Promise<Record<string, string>> {
+  const manifests: Record<string, string> = {};
+  for (const file of MANIFEST_FILES) {
+    const encodedName = encodeURIComponent(file);
+    const encodedRepo = encodeURIComponent(repo);
+    const res = await githubFetch(
+      `/repos/${encodeURIComponent(username)}/${encodedRepo}/contents/${encodedName}`,
+      token,
+    );
+    if (!res.ok) continue;
+    const data: { content?: string } = await res.json();
+    if (!data.content) continue;
+    try {
+      manifests[file] = atob(data.content.replace(/\s/g, ""));
+    } catch {
+      // konten bukan base64 valid — lewati file ini.
+    }
+  }
+  return manifests;
+}
+
+/**
+ * Lapis 3: REST publik, repos + languages + commits + manifests per repo,
+ * dibatasi konkurensi.
+ */
+async function fetchRepoLanguagesREST(
+  username: string,
+  token?: string,
+): Promise<RepoLanguages[]> {
+  const repos = await fetchRepos(username, token);
   return mapWithConcurrency(
     repos,
     4,
     async (repo): Promise<RepoLanguages> => ({
       name: repo.name,
-      languages: await fetchRepoLanguages(username, repo.name),
+      languages: await fetchRepoLanguages(username, repo.name, token),
+      commitMessages: await fetchRepoCommits(username, repo.name, token),
+      manifests: await fetchRepoManifests(username, repo.name, token),
     }),
   );
 }
@@ -121,10 +196,36 @@ interface GraphQlLangNode {
   name: string;
 }
 
+interface GraphQlCommitNode {
+  messageHeadline: string | null;
+}
+
+interface GraphQlHistory {
+  nodes: GraphQlCommitNode[] | null;
+}
+
+interface GraphQlTarget {
+  history: GraphQlHistory | null;
+}
+
+interface GraphQlDefaultBranch {
+  target: GraphQlTarget | null;
+}
+
+interface GraphQlBlob {
+  text: string | null;
+}
+
 interface GraphQlRepoNode {
   name: string;
   isArchived: boolean;
   languages: { nodes: GraphQlLangNode[] } | null;
+  defaultBranchRef: GraphQlDefaultBranch | null;
+  packageJson: GraphQlBlob | null;
+  composerJson: GraphQlBlob | null;
+  pubspecYaml: GraphQlBlob | null;
+  pyprojectToml: GraphQlBlob | null;
+  requirementsTxt: GraphQlBlob | null;
 }
 
 interface GraphQlRepositories {
@@ -137,9 +238,19 @@ interface GraphQlUser {
 }
 
 interface GraphQlData {
-  user: GraphQlUser | null;
+  data: {
+    user: GraphQlUser | null;
+  } | null;
   errors?: Array<{ message?: string }>;
 }
+
+const MANIFEST_FILES = [
+  "package.json",
+  "composer.json",
+  "pubspec.yaml",
+  "pyproject.toml",
+  "requirements.txt",
+];
 
 const REPO_QUERY = `
   query($login: String!, $cursor: String) {
@@ -147,6 +258,7 @@ const REPO_QUERY = `
       repositories(
         first: 100
         isFork: false
+        privacy: PUBLIC
         after: $cursor
         orderBy: { field: PUSHED_AT, direction: DESC }
       ) {
@@ -154,6 +266,30 @@ const REPO_QUERY = `
           name
           isArchived
           languages(first: 100) { nodes { name } }
+          defaultBranchRef {
+            target {
+              ... on Commit {
+                history(first: 30) {
+                  nodes { messageHeadline }
+                }
+              }
+            }
+          }
+          packageJson: object(expression: "HEAD:package.json") {
+            ... on Blob { text }
+          }
+          composerJson: object(expression: "HEAD:composer.json") {
+            ... on Blob { text }
+          }
+          pubspecYaml: object(expression: "HEAD:pubspec.yaml") {
+            ... on Blob { text }
+          }
+          pyprojectToml: object(expression: "HEAD:pyproject.toml") {
+            ... on Blob { text }
+          }
+          requirementsTxt: object(expression: "HEAD:requirements.txt") {
+            ... on Blob { text }
+          }
         }
         pageInfo { hasNextPage endCursor }
       }
@@ -202,11 +338,28 @@ async function graphqlRequest(
 
 export function reposFromGraphQl(data: GraphQlData): RepoLanguages[] {
   const repos: RepoLanguages[] = [];
-  for (const node of data.user?.repositories.nodes ?? []) {
+  for (const node of data.data?.user?.repositories.nodes ?? []) {
     if (node.isArchived) continue;
+    const commitMessages = (
+      node.defaultBranchRef?.target?.history?.nodes ?? []
+    )
+      .map((commit) => commit.messageHeadline ?? "")
+      .filter((message) => message.length > 0);
+
+    const manifests: Record<string, string> = {};
+    if (node.packageJson?.text) manifests.packageJson = node.packageJson.text;
+    if (node.composerJson?.text) manifests.composerJson = node.composerJson.text;
+    if (node.pubspecYaml?.text) manifests.pubspecYaml = node.pubspecYaml.text;
+    if (node.pyprojectToml?.text) manifests.pyprojectToml = node.pyprojectToml.text;
+    if (node.requirementsTxt?.text) {
+      manifests.requirementsTxt = node.requirementsTxt.text;
+    }
+
     repos.push({
       name: node.name,
       languages: (node.languages?.nodes ?? []).map((l) => l.name),
+      commitMessages,
+      manifests,
     });
   }
   return repos;
@@ -228,7 +381,7 @@ async function fetchRepoLanguagesGraphQl(
       { login: username, cursor },
       token,
     );
-    const pageInfo = data.user?.repositories.pageInfo;
+    const pageInfo = data.data?.user?.repositories.pageInfo;
     repos.push(...reposFromGraphQl(data));
     if (!pageInfo?.hasNextPage || !pageInfo.endCursor) break;
     cursor = pageInfo.endCursor;
@@ -283,15 +436,22 @@ export async function fetchReposWithLanguages(
     // Lapis 2 — GraphQL klien (VITE_GITHUB_TOKEN).
     const clientToken = import.meta.env.VITE_GITHUB_TOKEN;
     if (clientToken) {
+      if (isPlaceholderToken(clientToken)) {
+        // Jangan buang kuota: token masih placeholder dari .env.example.
+        throw new Error(
+          "VITE_GITHUB_TOKEN di .env masih PLACEHOLDER — ganti dengan PAT asli " +
+            "(fine-grained, read-only Public repositories). Contoh: .env.example",
+        );
+      }
       try {
         return await fetchRepoLanguagesGraphQl(username, clientToken);
       } catch {
-        // token invalid/expired → jatuh ke lapis 3.
+        // token invalid/expired → jatuh ke lapis 3 (REST juga pakai token).
       }
     }
 
-    // Lapis 3 — REST publik (tanpa token).
-    return fetchRepoLanguagesREST(username);
+    // Lapis 3 — REST (memakai VITE_GITHUB_TOKEN bila ada; bila tidak, publik).
+    return fetchRepoLanguagesREST(username, clientToken);
   }
 
   // Produksi: bila proxy gagal, tampilkan error jelas — jangan jatuh ke REST

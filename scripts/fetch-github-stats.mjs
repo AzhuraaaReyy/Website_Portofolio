@@ -1,4 +1,14 @@
 import { writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
+
+// Muat .env manual (mengikuti loader resmi Node: GITHUB_TOKEN dll).
+try {
+  if (existsSync(".env")) {
+    process.loadEnvFile(".env");
+  }
+} catch {
+  // .env rusak/ilegal — biarkan env apa adanya.
+}
 
 const GRAPHQL_ENDPOINT = "https://api.github.com/graphql";
 const MAX_PAGES = 10;
@@ -10,6 +20,7 @@ const REPO_QUERY = `
       repositories(
         first: ${PAGE_SIZE}
         isFork: false
+        privacy: PUBLIC
         after: $cursor
         orderBy: { field: PUSHED_AT, direction: DESC }
       ) {
@@ -17,6 +28,30 @@ const REPO_QUERY = `
           name
           isArchived
           languages(first: 100) { nodes { name } }
+          defaultBranchRef {
+            target {
+              ... on Commit {
+                history(first: 30) {
+                  nodes { messageHeadline }
+                }
+              }
+            }
+          }
+          packageJson: object(expression: "HEAD:package.json") {
+            ... on Blob { text }
+          }
+          composerJson: object(expression: "HEAD:composer.json") {
+            ... on Blob { text }
+          }
+          pubspecYaml: object(expression: "HEAD:pubspec.yaml") {
+            ... on Blob { text }
+          }
+          pyprojectToml: object(expression: "HEAD:pyproject.toml") {
+            ... on Blob { text }
+          }
+          requirementsTxt: object(expression: "HEAD:requirements.txt") {
+            ... on Blob { text }
+          }
         }
         pageInfo { hasNextPage endCursor }
       }
@@ -70,13 +105,28 @@ async function fetchRepos(owner, token) {
   let cursor = null;
   for (let page = 0; page < MAX_PAGES; page++) {
     const data = await graphqlRequest(owner, cursor, token);
-    const connection = data.user?.repositories;
+    const connection = data?.data?.user?.repositories;
     for (const node of connection?.nodes ?? []) {
       if (node.isArchived) continue;
       const languages = [
         ...new Set((node.languages?.nodes ?? []).map((lang) => lang.name)),
       ].sort();
-      repos.push({ name: node.name, languages });
+      const commitMessages = (
+        node.defaultBranchRef?.target?.history?.nodes ?? []
+      )
+        .map((commit) => commit.messageHeadline ?? "")
+        .filter((message) => message.length > 0);
+
+      const manifests = {};
+      if (node.packageJson?.text) manifests.packageJson = node.packageJson.text;
+      if (node.composerJson?.text) manifests.composerJson = node.composerJson.text;
+      if (node.pubspecYaml?.text) manifests.pubspecYaml = node.pubspecYaml.text;
+      if (node.pyprojectToml?.text) manifests.pyprojectToml = node.pyprojectToml.text;
+      if (node.requirementsTxt?.text) {
+        manifests.requirementsTxt = node.requirementsTxt.text;
+      }
+
+      repos.push({ name: node.name, languages, commitMessages, manifests });
     }
     if (!connection?.pageInfo?.hasNextPage || !connection.pageInfo.endCursor) {
       break;
@@ -90,6 +140,12 @@ async function main() {
   const token = process.env.GITHUB_TOKEN;
   if (!token) {
     throw new Error("Env GITHUB_TOKEN wajib diisi untuk memanggil GitHub API");
+  }
+  if (token.length < 31 || /placeholder|YOUR[_ -]?TOKEN|>|<|^\s*$/i.test(token)) {
+    throw new Error(
+      "GITHUB_TOKEN di .env masih PLACEHOLDER — ganti dengan PAT asli " +
+        "(fine-grained, read-only Public repositories). Contoh: .env.example",
+    );
   }
   const owner = resolveOwner(process.argv.slice(2));
   if (!owner) {

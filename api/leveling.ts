@@ -6,6 +6,35 @@ const GRAPHQL_ENDPOINT = "https://api.github.com/graphql";
 const MAX_PAGES = 10;
 const UPSTREAM_TIMEOUT_MS = 15000;
 
+// Rate limit ringan di sisi kode: membatasi panggilan per IP agar kuota
+// GraphQL GitHub (5000 poin/jam) tidak habis karena request berulang.
+// State disimpan globalThis (bertahan antar-invocation pada instance yang
+// sama; bukan pengganti WAF Vercel, tapi lapisan pertahanan pertama).
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 15;
+
+interface RateBucket {
+  count: number;
+  resetAt: number;
+}
+
+interface GlobalState {
+  rate?: Record<string, RateBucket>;
+}
+
+function rateLimited(clientIp: string): boolean {
+  const now = Date.now();
+  const g = globalThis as unknown as GlobalState;
+  g.rate ??= {};
+  const bucket = g.rate[clientIp];
+  if (!bucket || now >= bucket.resetAt) {
+    g.rate[clientIp] = { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS };
+    return false;
+  }
+  bucket.count += 1;
+  return bucket.count > RATE_LIMIT_MAX;
+}
+
 // Hanya username milik situs ini yang boleh disinkronkan.
 // Nilai dari env GITHUB_USERNAME (bila di-set di Vercel), default ke pemilik.
 const ALLOWED_USERNAME = (process.env.GITHUB_USERNAME || "AzhuraaaReyy").trim();
@@ -14,10 +43,36 @@ interface GraphQlLangNode {
   name: string;
 }
 
+interface GraphQlCommitNode {
+  messageHeadline: string | null;
+}
+
+interface GraphQlHistory {
+  nodes: GraphQlCommitNode[] | null;
+}
+
+interface GraphQlTarget {
+  history: GraphQlHistory | null;
+}
+
+interface GraphQlDefaultBranch {
+  target: GraphQlTarget | null;
+}
+
+interface GraphQlBlob {
+  text: string | null;
+}
+
 interface GraphQlRepoNode {
   name: string;
   isArchived: boolean;
   languages: { nodes: GraphQlLangNode[] } | null;
+  defaultBranchRef: GraphQlDefaultBranch | null;
+  packageJson: GraphQlBlob | null;
+  composerJson: GraphQlBlob | null;
+  pubspecYaml: GraphQlBlob | null;
+  pyprojectToml: GraphQlBlob | null;
+  requirementsTxt: GraphQlBlob | null;
 }
 
 interface GraphQlRepositories {
@@ -30,7 +85,9 @@ interface GraphQlUser {
 }
 
 interface GraphQlData {
-  user: GraphQlUser | null;
+  data: {
+    user: GraphQlUser | null;
+  } | null;
   errors?: Array<{ message?: string }>;
 }
 
@@ -40,6 +97,7 @@ const REPO_QUERY = `
       repositories(
         first: 100
         isFork: false
+        privacy: PUBLIC
         after: $cursor
         orderBy: { field: PUSHED_AT, direction: DESC }
       ) {
@@ -47,6 +105,30 @@ const REPO_QUERY = `
           name
           isArchived
           languages(first: 100) { nodes { name } }
+          defaultBranchRef {
+            target {
+              ... on Commit {
+                history(first: 30) {
+                  nodes { messageHeadline }
+                }
+              }
+            }
+          }
+          packageJson: object(expression: "HEAD:package.json") {
+            ... on Blob { text }
+          }
+          composerJson: object(expression: "HEAD:composer.json") {
+            ... on Blob { text }
+          }
+          pubspecYaml: object(expression: "HEAD:pubspec.yaml") {
+            ... on Blob { text }
+          }
+          pyprojectToml: object(expression: "HEAD:pyproject.toml") {
+            ... on Blob { text }
+          }
+          requirementsTxt: object(expression: "HEAD:requirements.txt") {
+            ... on Blob { text }
+          }
         }
         pageInfo { hasNextPage endCursor }
       }
@@ -57,13 +139,15 @@ const REPO_QUERY = `
 interface RepoLanguages {
   name: string;
   languages: string[];
+  commitMessages: string[];
+  manifests: Record<string, string>;
 }
 
 async function fetchGraphQlPage(
   login: string,
   cursor: string | null,
   token: string,
-): Promise<GraphQlData> {
+): Promise<NonNullable<GraphQlData["data"]>> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
 
@@ -103,7 +187,10 @@ async function fetchGraphQlPage(
   if (body.errors?.length) {
     throw new Error(body.errors[0].message ?? "GraphQL mengembalikan error");
   }
-  return body;
+  if (!body.data?.user) {
+    throw new Error("GitHub tidak menemukan pengguna tersebut");
+  }
+  return body.data;
 }
 
 export default async function handler(req: Request): Promise<Response> {
@@ -120,6 +207,22 @@ export default async function handler(req: Request): Promise<Response> {
       status: 503,
       headers: { "Content-Type": "application/json" },
     });
+  }
+
+  // Rate limit per IP: Vercel meneruskan IP asli via header x-forwarded-for.
+  const clientIp =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  if (rateLimited(clientIp)) {
+    return new Response(
+      JSON.stringify({ error: "terlalu banyak permintaan — coba lagi" }),
+      {
+        status: 429,
+        headers: {
+          "Content-Type": "application/json",
+          "Retry-After": "60",
+        },
+      },
+    );
   }
 
   // Authorization: hanya username situs sendiri yang boleh di-sync (anti abuse kuota).
@@ -148,9 +251,26 @@ export default async function handler(req: Request): Promise<Response> {
       if (!user?.repositories) break;
       for (const node of user.repositories.nodes ?? []) {
         if (node.isArchived) continue;
+        const commitMessages = (
+          node.defaultBranchRef?.target?.history?.nodes ?? []
+        )
+          .map((commit) => commit.messageHeadline ?? "")
+          .filter((message) => message.length > 0);
+
+        const manifests: Record<string, string> = {};
+        if (node.packageJson?.text) manifests.packageJson = node.packageJson.text;
+        if (node.composerJson?.text) manifests.composerJson = node.composerJson.text;
+        if (node.pubspecYaml?.text) manifests.pubspecYaml = node.pubspecYaml.text;
+        if (node.pyprojectToml?.text) manifests.pyprojectToml = node.pyprojectToml.text;
+        if (node.requirementsTxt?.text) {
+          manifests.requirementsTxt = node.requirementsTxt.text;
+        }
+
         repos.push({
           name: node.name,
           languages: (node.languages?.nodes ?? []).map((l) => l.name),
+          commitMessages,
+          manifests,
         });
       }
       if (!user.repositories.pageInfo.hasNextPage) break;

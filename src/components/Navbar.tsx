@@ -3,10 +3,6 @@ import { Menu, X, Gamepad2, Wifi, RefreshCw } from "lucide-react";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 import { useGithubStatsContext } from "../context/GithubStatsContext";
 
-interface NavbarProps {
-  activeSection?: string;
-}
-
 function PingStatus() {
   const [ping, setPing] = useState(12);
   const reducedMotion = useReducedMotion();
@@ -41,47 +37,49 @@ function PingStatus() {
   );
 }
 
-export function Navbar({
-  activeSection: activeSectionProp,
-}: NavbarProps) {
+const navLinks = [
+  { label: "BERANDA", href: "#home" },
+  { label: "TENTANG SAYA", href: "#about" },
+  { label: "KEAHLIAN", href: "#skills" },
+  { label: "PROYEK", href: "#projects" },
+  { label: "STATISTIK", href: "#stats" },
+  { label: "PENGALAMAN", href: "#experience" },
+  { label: "KONTAK", href: "#contact" },
+];
+
+export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [currentActive, setCurrentActive] = useState(
-    activeSectionProp || "home"
-  );
+  const [currentActive, setCurrentActive] = useState("home");
   const { summary, loading, error, retry } = useGithubStatsContext();
   const hasError = error !== null;
 
-  const navLinks = [
-    { label: "BERANDA", href: "#home" },
-    { label: "TENTANG SAYA", href: "#about" },
-    { label: "KEAHLIAN", href: "#skills" },
-    { label: "PROYEK", href: "#projects" },
-    { label: "STATISTIK", href: "#stats" },
-    { label: "PENGALAMAN", href: "#experience" },
-    { label: "KONTAK", href: "#contact" },
-  ];
-
-  useEffect(() => {
-    if (activeSectionProp) {
-      setCurrentActive(activeSectionProp);
-    }
-  }, [activeSectionProp]);
-
   useEffect(() => {
     let ticking = false;
+    const sectionIds = navLinks.map((link) => link.href.substring(1));
+
+    const updateActive = () => {
+      const probe = window.scrollY + window.innerHeight * 0.4;
+      let current = sectionIds[0] ?? "home";
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (el && el.offsetTop <= probe) current = id;
+      }
+      setCurrentActive(current);
+    };
 
     const handleScroll = () => {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
         setScrolled(window.scrollY > 20);
+        updateActive();
         ticking = false;
       });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
+    updateActive();
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -127,22 +125,22 @@ export function Navbar({
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between relative">
         {/* Left Side: Game Logo + Status Bar (LVL, Bar, RANK & PING) */}
-        <div className="flex items-center shrink-0">
+        <div className="flex items-center min-w-0">
           <a
             href="#home"
             onClick={(e) => handleLinkClick(e, "#home")}
-            className="flex items-center gap-3 group cursor-pointer skew-x-[-10deg] py-1.5 transition-all duration-300 border-l-4 border-blueprint-teal bg-transparent hover:bg-blueprint-teal/10 pl-3.5 pr-2"
+            className="flex items-center gap-3 group cursor-pointer skew-x-[-10deg] py-1.5 transition-all duration-300 border-l-4 border-blueprint-teal bg-transparent hover:bg-blueprint-teal/10 pl-3.5 pr-2 min-w-0"
           >
             <Gamepad2 className="w-6 h-6 text-blueprint-teal drop-shadow-[0_0_8px_#5EEAD4] group-hover:scale-110 transition-transform shrink-0" />
 
-            <div className="flex flex-col gap-0.5">
+            <div className="flex flex-col gap-0.5 min-w-0">
               {/* Teks Nama Utama */}
-              <span className="font-display font-black text-lg md:text-xl italic text-blueprint-text group-hover:text-blueprint-teal transition-colors tracking-wide leading-none">
+              <span className="font-display font-black text-lg md:text-xl italic text-blueprint-text group-hover:text-blueprint-teal transition-colors tracking-wide leading-none whitespace-nowrap">
                 MUHAMMAD<span className="text-blueprint-teal/50">_</span>RIZAL
               </span>
 
               {/* Status Bar */}
-              <div className="flex items-center gap-2 font-mono text-[9px] sm:text-[10px] tracking-wider leading-none mt-1">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[9px] sm:text-[10px] tracking-wider leading-none mt-1">
                 <div className="flex items-center gap-1">
                   <span className="text-blueprint-textSec">LVL</span>
                   {loading ? (
@@ -162,14 +160,9 @@ export function Navbar({
                   />
                 </div>
 
-                <div className="flex items-center gap-1">
-                  <span className="text-blueprint-textSec">RANK</span>
-                  <span className="font-display font-black text-blueprint-amber uppercase truncate max-w-[9rem] hidden md:inline-block">
-                    {hasError
-                      ? "OFFLINE"
-                      : summary?.tier.title ?? "MENUNGGU DATA"}
-                  </span>
-                  <span className="font-display font-black text-blueprint-amber uppercase truncate max-w-[7rem] md:hidden">
+                <div className="flex items-center gap-1 shrink-0">
+                  <span className="text-blueprint-textSec shrink-0">RANK</span>
+                  <span className="font-display font-black text-blueprint-amber uppercase whitespace-nowrap">
                     {hasError
                       ? "OFFLINE"
                       : summary?.tier.title ?? "MENUNGGU DATA"}

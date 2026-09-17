@@ -45,6 +45,48 @@ export const LEVELING_CONFIG: LevelingConfig = {
   ],
 };
 
+// Kata kunci deteksi "proyek selesai": dicocokkan (case-insensitive) ke isi
+// pesan komit (messageHeadline). Satu repo dianggap SELESAI bila minimal
+// satu dari 30 komit terakhir mengandung salah satu kata kunci ini.
+export const COMPLETION_KEYWORDS = [
+  "selesai",
+  "done",
+  "final",
+  "finished",
+  "release",
+  "v1.0",
+  "v1.1",
+];
+
+export interface TechPattern {
+  match: string;
+  label: string;
+}
+
+// Deteksi tech stack dari skrip proyek (package.json / composer.json /
+// pubspec.yaml). `match` dipakai substring case-insensitive terhadap isi
+// file; `label` adalah nama teknologi yang tampil di UI.
+export const TECH_PATTERNS: TechPattern[] = [
+  { match: "react", label: "React" },
+  { match: "vue", label: "Vue.js" },
+  { match: "tailwindcss", label: "Tailwind CSS" },
+  { match: "next", label: "Next.js" },
+  { match: "nuxt", label: "Nuxt.js" },
+  { match: "laravel/framework", label: "Laravel" },
+  { match: "flutter", label: "Flutter" },
+  { match: "express", label: "Express.js" },
+  { match: "fastapi", label: "FastAPI" },
+  { match: "django", label: "Django" },
+  { match: "flask", label: "Flask" },
+  { match: "svelte", label: "Svelte" },
+  { match: "angular", label: "Angular" },
+  { match: "astro", label: "Astro" },
+  { match: "vite", label: "Vite" },
+  { match: "bootstrap", label: "Bootstrap" },
+  { match: "socket.io", label: "Socket.IO" },
+  { match: "dockerfile", label: "Docker" },
+];
+
 // ⚠️  JANGAN isi token di sini. File ini dibundel ke JavaScript klien →
 //    siapa saja bisa melihat dan mencurinya.  GitHub token hanya boleh
 //    dipakai di environment server / edge function.

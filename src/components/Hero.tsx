@@ -8,7 +8,10 @@ import {
 } from "lucide-react";
 import { profileData } from "../data/portfolioData";
 import { useReducedMotion } from "../hooks/useReducedMotion";
+import { useTabVisible } from "../hooks/useTabVisible";
+import { useGsapReveal } from "../hooks/useGsapReveal";
 import { GithubIcon, LinkedinIcon } from "./ui/SocialIcons";
+import gsap from "gsap";
 
 const ParticleCanvas = lazy(() =>
   import("./3d/ParticleCanvas").then((m) => ({ default: m.ParticleCanvas })),
@@ -19,10 +22,16 @@ const HeroAnimated = lazy(() =>
 );
 
 export function Hero() {
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [heroInView, setHeroInView] = useState(true);
   const heroRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const reducedMotion = useReducedMotion();
+  const tabVisible = useTabVisible();
+  const gsapRevealRef = useGsapReveal<HTMLElement>();
+
+  // Progres scroll di-ref: dibaca langsung di useFrame partikel →
+  // scroll tidak lagi memicu re-render React (sumber utama jank).
+  const scrollProgressRef = useRef(0);
 
   // Hentikan render loop 3D saat Hero di luar layar (hemat CPU/GPU saat scroll).
   useEffect(() => {
@@ -36,6 +45,24 @@ export function Hero() {
     return () => io.disconnect();
   }, []);
 
+  // Pause video saat Hero keluar layar / resume saat tampil.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          v.play().catch(() => {});
+        } else {
+          v.pause();
+        }
+      },
+      { rootMargin: "100px 0px" },
+    );
+    io.observe(v);
+    return () => io.disconnect();
+  }, []);
+
   useEffect(() => {
     let ticking = false;
     let heroHeight = 0;
@@ -46,11 +73,20 @@ export function Hero() {
     };
 
     const handleScroll = () => {
-      const progress = Math.max(
+      const target = Math.max(
         0,
         Math.min(1, window.scrollY / (heroHeight || 1)),
       );
-      setScrollProgress(progress);
+      if (reducedMotion) {
+        scrollProgressRef.current = target;
+      } else {
+        gsap.to(scrollProgressRef, {
+          current: target,
+          duration: 0.45,
+          ease: "power2.out",
+          overwrite: true,
+        });
+      }
     };
 
     const onScroll = () => {
@@ -69,7 +105,7 @@ export function Hero() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", measure);
     };
-  }, []);
+  }, [reducedMotion]);
 
   const handleScrollToProjects = (
     e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
@@ -106,17 +142,20 @@ export function Hero() {
   return (
     <section
       id="home"
-      ref={heroRef}
+      ref={(node: HTMLElement | null) => {
+        heroRef.current = node as HTMLDivElement | null;
+        gsapRevealRef.current = node;
+      }}
       className="relative min-h-screen flex flex-col justify-center overflow-hidden section-scroll"
     >
-      <div className="absolute inset-0 w-full h-full z-0 hidden md:block">
+      <div className="absolute inset-0 w-full h-full z-0 hidden md:block" data-gsap-reveal>
         <video
+          ref={videoRef}
           autoPlay
           muted
           loop
           playsInline
           preload="none"
-          poster="/path/to/poster-image.jpg" // Ganti dengan gambar statis yang ringan
           className="w-full h-full object-cover"
         >
           <source
@@ -127,11 +166,9 @@ export function Hero() {
       </div>
 
       {/* Hex/Grid Overlay - Game Matchmaking Lobby Style */}
-      <div className="absolute inset-0 z-0 bg-blueprint-bg/85 backdrop-blur-[3px] blueprint-grid bg-grid-size opacity-90 mix-blend-screen" />
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,rgba(94,234,212,0.1)_0%,rgba(11,18,32,0.8)_80%)] pointer-events-none" />
-
-      {/* Decorative Game UI Elements (Diturunkan sejajar dengan posisi teks utama) */}
-      <div className="absolute left-6 top-[42%] -translate-y-1/2 z-10 font-mono text-[10px] text-blueprint-teal/80 hidden lg:block pointer-events-none">
+      <div className="absolute inset-0 z-0 bg-blueprint-bg/85 backdrop-blur-[3px] blueprint-grid bg-grid-size opacity-90 mix-blend-screen" data-gsap-reveal />
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,rgba(94,234,212,0.1)_0%,rgba(11,18,32,0.8)_80%)] pointer-events-none" />{/* Decorative Game UI Elements (Diturunkan sejajar dengan posisi teks utama) */}
+      <div className="absolute left-6 top-[42%] -translate-y-1/2 z-10 font-mono text-[10px] text-blueprint-teal/80 hidden lg:block pointer-events-none" data-gsap-reveal>
         <div className="flex items-center gap-2 mb-2 font-bold">
           <Crosshair className="w-3.5 h-3.5 text-blueprint-teal" />{" "}
           SYS.IDENTIFIED
@@ -140,7 +177,7 @@ export function Hero() {
         <div className="tracking-widest">LATENCY: 12ms</div>
       </div>
 
-      <div className="absolute right-6 top-[42%] -translate-y-1/2 z-10 font-mono text-[10px] text-blueprint-amber/80 hidden lg:block text-right pointer-events-none">
+      <div className="absolute right-6 top-[42%] -translate-y-1/2 z-10 font-mono text-[10px] text-blueprint-amber/80 hidden lg:block text-right pointer-events-none" data-gsap-reveal>
         <div className="flex items-center justify-end gap-2 mb-2 font-bold">
           <ShieldAlert className="w-3.5 h-3.5 text-blueprint-amber" />{" "}
           CLEARANCE_LEVEL
@@ -159,8 +196,8 @@ export function Hero() {
         }
       >
         <ParticleCanvas
-          scrollProgress={scrollProgress}
-          frameloop={heroInView ? "always" : "never"}
+          scrollProgressRef={scrollProgressRef}
+          frameloop={heroInView && tabVisible ? "always" : "never"}
         />
       </Suspense>
 
@@ -186,7 +223,7 @@ export function Hero() {
       </div>
 
       {/* HUD / Footer Status Strip */}
-      <div className="absolute bottom-0 left-0 w-full z-10 border-t-2 border-blueprint-teal/30 bg-blueprint-bg/80 backdrop-blur-md">
+      <div className="absolute bottom-0 left-0 w-full z-10 border-t-2 border-blueprint-teal/30 bg-blueprint-bg/80 backdrop-blur-md" data-gsap-reveal>
         <div className="max-w-7xl mx-auto px-6 h-14 grid grid-cols-1 md:grid-cols-3 items-center gap-4 text-center md:text-left">
           {/* Col 1 */}
           <div className="hidden md:flex items-center gap-3 text-blueprint-textSec font-mono text-xs">

@@ -70,7 +70,7 @@ export interface ArsenalGroupData {
 
 export const profileData: Profile = {
   name: "Muhammad Rizal",
-  avatar: "/assets/images/Foto1.jpeg",
+  avatar: "/assets/images/Foto1.webp",
   role: "Full-Stack Engineer",
   tagline:
     "Full-Stack Web Developer yang berfokus pada efisiensi alur bisnis dan kualitas antarmuka web.",

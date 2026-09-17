@@ -4,10 +4,11 @@ import * as THREE from "three";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 
 interface MorphingParticlesProps {
-  scrollProgress: number; // 0 to 1 based on scroll position in Hero
+  /** Ref progres scroll hero (0..1) — dibaca langsung saat tiap frame. */
+  scrollProgressRef: { current: number };
 }
 
-export function MorphingParticles({ scrollProgress }: MorphingParticlesProps) {
+export function MorphingParticles({ scrollProgressRef }: MorphingParticlesProps) {
   const pointsRef = useRef<THREE.Points>(null);
   const reducedMotion = useReducedMotion();
   const [isMobile, setIsMobile] = useState(false);
@@ -113,6 +114,7 @@ export function MorphingParticles({ scrollProgress }: MorphingParticlesProps) {
     const points = pointsRef.current;
     const posAttribute = points.geometry.attributes.position as THREE.BufferAttribute;
     const positions = posAttribute.array as Float32Array;
+    const scrollProgress = scrollProgressRef.current;
 
     // Determine target based on scroll progress
     let target: Float32Array;

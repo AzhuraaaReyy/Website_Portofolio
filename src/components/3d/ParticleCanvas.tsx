@@ -5,11 +5,17 @@ import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { useState, useEffect } from "react";
 
 interface ParticleCanvasProps {
-  scrollProgress: number;
+  /** Ref berisi progres scroll hero (0..1) — dibaca langsung di useFrame,
+   *  sehingga scroll TIDAK memicu re-render React. */
+  scrollProgressRef: { current: number };
   frameloop?: "always" | "never" | "demand";
 }
 
-function CameraController({ scrollProgress }: { scrollProgress: number }) {
+function CameraController({
+  scrollProgressRef,
+}: {
+  scrollProgressRef: { current: number };
+}) {
   const reducedMotion = useReducedMotion();
 
   useFrame((state) => {
@@ -19,6 +25,7 @@ function CameraController({ scrollProgress }: { scrollProgress: number }) {
       return;
     }
 
+    const scrollProgress = scrollProgressRef.current;
     // Camera moves closer and pans slightly down as the user scrolls
     const targetZ = 5.5 - scrollProgress * 1.2;
     const targetY = -scrollProgress * 0.4;
@@ -27,14 +34,17 @@ function CameraController({ scrollProgress }: { scrollProgress: number }) {
     state.camera.position.x = THREE.MathUtils.lerp(state.camera.position.x, targetX, 0.05);
     state.camera.position.y = THREE.MathUtils.lerp(state.camera.position.y, targetY, 0.05);
     state.camera.position.z = THREE.MathUtils.lerp(state.camera.position.z, targetZ, 0.05);
-    
+
     state.camera.lookAt(0, 0, 0);
   });
 
   return null;
 }
 
-export function ParticleCanvas({ scrollProgress, frameloop = "always" }: ParticleCanvasProps) {
+export function ParticleCanvas({
+  scrollProgressRef,
+  frameloop = "always",
+}: ParticleCanvasProps) {
   const [webGlSupported, setWebGlSupported] = useState(true);
 
   // Detect WebGL availability
@@ -66,14 +76,14 @@ export function ParticleCanvas({ scrollProgress, frameloop = "always" }: Particl
     <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
       <Canvas
         camera={{ position: [0, 0, 5.5], fov: 60 }}
-        gl={{ antialias: true, alpha: true }}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         dpr={[1, 1.5]}
         frameloop={frameloop}
       >
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={1.5} />
-        <MorphingParticles scrollProgress={scrollProgress} />
-        <CameraController scrollProgress={scrollProgress} />
+        <MorphingParticles scrollProgressRef={scrollProgressRef} />
+        <CameraController scrollProgressRef={scrollProgressRef} />
       </Canvas>
     </div>
   );

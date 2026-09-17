@@ -9,7 +9,9 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useReducedMotion } from "../hooks/useReducedMotion";
+import { useGsapReveal } from "../hooks/useGsapReveal";
 import { AmbientBackground } from "./ui/AmbientBackground";
+import { GlitchHeading } from "./ui/GlitchHeading";
 import {
   GithubIcon,
   LinkedinIcon,
@@ -19,6 +21,7 @@ import {
 
 export function Contact() {
   const reducedMotion = useReducedMotion();
+  const gsapRevealRef = useGsapReveal<HTMLDivElement>();
   const [activeIndex, setActiveIndex] = useState(0);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
@@ -95,7 +98,7 @@ export function Contact() {
       label: "MEDIA SOSIAL",
       title: "INSTAGRAM ",
       value: "instagram.com/mhmmad.rzall",
-      href: "https://www.instagram.com/mhmmad.rzall?stkn=MWswZGh1b2xveDB1eg==",
+      href: "https://www.instagram.com/mhmmad.rzall",
       desc: "Media sosial untuk melihat aktivitas dan pembaruan di luar pekerjaan dan proyek profesional.",
       status: "ONLINE",
       ping: "15ms",
@@ -167,7 +170,6 @@ export function Contact() {
       setTilt({ x: rotateX, y: rotateY });
     });
   };
-  const steps = (n: number) => (t: number) => Math.floor(t * n) / n;
   const handleMouseLeaveTilt = () => {
     setTilt({ x: 0, y: 0 });
   };
@@ -175,6 +177,7 @@ export function Contact() {
   return (
     <section
       id="contact"
+      ref={gsapRevealRef}
       className="py-24 bg-blueprint-bg relative section-scroll border-t border-blueprint-teal/20 overflow-hidden font-mono select-none min-h-[900px] flex flex-col justify-center"
     >
       <AmbientBackground
@@ -187,7 +190,7 @@ export function Contact() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(94,234,212,0.06)_0%,transparent_65%)] pointer-events-none" />
 
       <div className="max-w-[1400px] mx-auto px-4 relative z-10 w-full">
-        <div className="mb-8 flex flex-col items-center text-center">
+        <div className="mb-8 flex flex-col items-center text-center" data-gsap-reveal>
           <div className="font-mono font-bold text-xs tracking-widest text-blueprint-teal mb-4 px-4 py-1.5 bg-blueprint-teal/10 border-l-4 border-blueprint-teal skew-x-[-8deg] inline-flex items-center gap-2">
             <span className="skew-x-[8deg] flex items-center gap-2">
               <Radio className="w-3.5 h-3.5 text-blueprint-amber animate-pulse" />
@@ -195,61 +198,14 @@ export function Contact() {
             </span>
           </div>
 
-          <div className="relative inline-block group cursor-default text-center mb-4">
-            {/* Glitch Layer Cyan */}
-            <motion.h2
-              aria-hidden="true"
-              animate={{
-                x: [-2, 4, -3, 2, 0],
-                y: [0, -1, 1, 0],
-                opacity: [0.8, 0.2, 0.9, 0.3, 0.8],
-                skewX: [-5, -8, -3, -6, -5],
-              }}
-              transition={{
-                duration: 0.6,
-                repeat: Infinity,
-                repeatType: "mirror",
-                ease: steps(3),
-              }}
-              className="absolute inset-0 text-3xl sm:text-4xl md:text-5xl font-black font-display text-cyan-400 tracking-tighter pointer-events-none uppercase italic z-0 mix-blend-screen whitespace-nowrap"
-              style={{
-                clipPath: "polygon(0 0, 100% 0, 100% 45%, 0 45%)",
-                filter: "drop-shadow(-2px 0px 2px rgba(6,182,212,0.8))",
-              }}
-            >
-              MARI TERHUBUNG
-            </motion.h2>
-
-            {/* Glitch Layer Rose */}
-            <motion.h2
-              aria-hidden="true"
-              animate={{
-                x: [3, -3, 4, -2, 0],
-                y: [0, 1, -1, 0],
-                opacity: [0.9, 0.3, 0.8, 0.2, 0.9],
-                skewX: [-5, -2, -7, -4, -5],
-              }}
-              transition={{
-                duration: 0.45,
-                repeat: Infinity,
-                repeatType: "mirror",
-                ease: steps(2),
-                delay: 0.05,
-              }}
-              className="absolute inset-0 text-3xl sm:text-4xl md:text-5xl font-black font-display text-rose-500 tracking-tighter pointer-events-none uppercase italic z-0 mix-blend-screen whitespace-nowrap"
-              style={{
-                clipPath: "polygon(0 50%, 100% 50%, 100% 100%, 0 100%)",
-                filter: "drop-shadow(2px 0px 2px rgba(244,63,94,0.8))",
-              }}
-            >
-              MARI TERHUBUNG
-            </motion.h2>
-
-            {/* Main Title */}
-            <h2 className="relative text-3xl sm:text-4xl md:text-5xl font-black font-display text-blueprint-text tracking-tighter drop-shadow-[0_0_20px_rgba(94,234,212,0.4)] hover:text-blueprint-teal transition-colors duration-300 uppercase italic skew-x-[-5deg] z-10 whitespace-nowrap">
-              MARI <span className="text-blueprint-teal">TERHUBUNG</span>
-            </h2>
-          </div>
+          <GlitchHeading
+            text="MARI TERHUBUNG"
+            size="md"
+            nowrap
+            className="group cursor-default text-center mb-4"
+          >
+            MARI <span className="text-blueprint-teal">TERHUBUNG</span>
+          </GlitchHeading>
 
           <p className="font-mono text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl border-y border-blueprint-teal/15 py-2.5 px-4 bg-blueprint-bgSec/40 backdrop-blur-sm mb-3">
             Terbuka untuk peluang kerja di bidang Software Engineering dan Web
@@ -462,7 +418,7 @@ export function Contact() {
           </motion.div>
         </div>
 
-        <div className="mt-8 text-center font-mono text-[10px] text-slate-400 tracking-widest uppercase">
+        <div className="mt-8 text-center font-mono text-[10px] text-slate-400 tracking-widest uppercase" data-gsap-reveal>
           [ Terbuka untuk komunikasi terkait peluang kerja dan kolaborasi
           profesional. ]
         </div>
